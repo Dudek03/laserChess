@@ -38,3 +38,26 @@ body{
     font-size: xx-large;
     text-transform: uppercase;
 }
+
+#boardChoice{
+    position: absolute;
+    display: grid;
+    text-align: center;
+    align-items: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    padding: 15px;
+    border: 2px green solid;
+    border-radius: 50px;
+}
+
+.choice{
+    margin-top: 20px;
+}
+
+#sendBoardChoice{
+    margin-top: 20px;
+}
+

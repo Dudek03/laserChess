@@ -1,7 +1,6 @@
-// import Game from './Game.js'
-// import Ui from './Ui.js'
-import Game from "./Game";
-import Ui from "./Ui";
+import Game from './Game.js'
+import Ui from './Ui.js'
+
 let game;
 let ui;
 window.onload = () => {

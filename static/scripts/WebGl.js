@@ -1,5 +1,7 @@
 class WebGl{
+    static instance
     constructor(){
+        WebGl.instance = this
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.1, 10000);
         this.renderer = new THREE.WebGLRenderer();
@@ -26,7 +28,6 @@ class WebGl{
         this.renderer.render(this.scene, this.camera);
         //console.log("render leci")
         window.addEventListener('resize', this.onWindowResize.bind(this), false);
-        TWEEN.update();
     }
 
     onWindowResize() {
@@ -36,4 +37,4 @@ class WebGl{
     }
 }
 
-module.exports = WebGl
+export default WebGl
