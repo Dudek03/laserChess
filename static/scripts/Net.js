@@ -1,9 +1,9 @@
 import Ui from "./Ui.js"
 class Net {
-    constructor(){
+    constructor() {
         this.ui = new Ui
     }
-   
+
 
     addPlayer(name) {
         fetch("/addPlayer", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ login: name }) })
@@ -22,16 +22,23 @@ class Net {
         return res
     }
 
-    playerBoardChoice(data){
-        fetch("/playerBoardChoice", {method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({choice: data})})
+    playerBoardChoice(data, name) {
+        fetch("/playerBoardChoice", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ choice: data, login: name }) })
             .then(res => res.text())
             .catch(err => console.log(err))
     }
 
-    checkChosenBoardLen(){
-        fetch("chosenBoardLen")
+    checkChosenBoardLen() {
+        const res = fetch("/chosenBoardLen")
+            .then(res => res.json())
+            .catch(err => console.log(err))
+        return res
+    }
+
+    chooseFinalBoard() {
+        fetch("/chooseFinalBoard")
             .then(res => res.text())
-            .then(res => console.log(res))
+            .then(res => console.log(res, "final board"))
             .catch(err => console.log(err))
     }
 

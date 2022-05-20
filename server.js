@@ -7,6 +7,8 @@ app.use(express.static('static'))
 var path = require("path")
 const userController = require("./controllers/userController")
 
+//logowanie
+
 app.post("/addPlayer", function (req, res){
     let response = userController.add(req)
     res.send(response)
@@ -14,6 +16,23 @@ app.post("/addPlayer", function (req, res){
 
 app.get("/checkTabLen", function (req, res) {
     let response = userController.checkTabLength()
+    res.send(response)
+})
+
+//wybór planszy
+
+app.post("/playerBoardChoice", function(req, res) {
+    let response = userController.addPlayerBoardChoice(req.body)
+    res.send(response)
+})
+
+app.get("/chosenBoardLen", function(req, res) {
+    let response = userController.checkChosenBoardLen()
+    res.send(response)
+})
+
+app.get("/chooseFinalBoard", function(req, res){
+    let response = userController.chooseFinalBoard()
     res.send(response)
 })
 

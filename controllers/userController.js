@@ -19,5 +19,48 @@ module.exports = {
         let ans = {}
         ans.len = data.userTab.length
         return JSON.stringify(ans)
+    },
+
+    addPlayerBoardChoice: (req) => {
+        //let temp = JSON.parse(data)
+        let found = data.chosenBoards.find(e => e.login == req.login)
+        if (found) return
+        console.log(req)
+        data.chosenBoards.push(req)
+        console.log(data.chosenBoards)
+    },
+
+    checkChosenBoardLen: () => {
+        let ans = {}
+        ans.len = data.chosenBoards.length
+        return JSON.stringify(ans)
+    },
+
+    chooseFinalBoard: () => {
+        let res
+        let firstPlayerChoice = data.chosenBoards[0].choice
+        let secondPlayerChoice = data.chosenBoards[1].choice
+        if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice == 'random')
+            res = Math.floor(Math.random() * 6) + 1
+
+        else if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice != 'random')
+            res = data.chosenBoards[0].choice
+
+        else if (firstPlayerChoice != secondPlayerChoice && firstPlayerChoice != 'random' && firstPlayerChoice != 'random') {
+            let temp = Math.floor(Math.random() * 2)
+            res = data.chosenBoards[temp].choice
+        }
+
+        else if(firstPlayerChoice != secondPlayerChoice && (firstPlayerChoice == 'random' || secondPlayerChoice == 'random')){
+            if(firstPlayerChoice == 'random')
+                res = data.chosenBoards[1].choice
+            else
+                res = data.chosenBoards[0].choice
+        }
+
+        data.finalBboard = res
+
+        return res
     }
+
 }

@@ -1,8 +1,6 @@
 import Net from "./Net.js"
 import WebGl from "./WebGl.js"
 import Ui from "./Ui.js"
-// const Net = require("./Net")
-// const WebGl = require("./WebGl")
 class Game {
     static instance
     constructor() {
@@ -46,12 +44,14 @@ class Game {
         })
 
         document.getElementById("sendBoardChoice").addEventListener("click", () => {
-            this.net.playerBoardChoice(playerChoice)
+            let name = document.getElementById("logged").innerText
+            this.net.playerBoardChoice(playerChoice, name)
             const checkBoardChoice = setInterval(async () => {
                 //console.log(await net.checkPlayers())
                 if ((await this.net.checkChosenBoardLen()).len == 2) {
                     clearInterval(checkBoardChoice)
-                    //TODO kurwa jak najszybciej
+                    //console.log("hihihha")
+                    this.net.chooseFinalBoard()
                 }
             }, 1000)
         })
