@@ -15,6 +15,13 @@ class Ui {
         document.getElementById("boardChoice").style.display = "block"
     }
 
+    waitForSecondPlayerChoice(){
+        document.getElementById("boardChoice").style.display = "none"
+        document.getElementById("loginWindow").style.display = "block"
+        document.getElementById("loginWindow").style.fontSize = "xx-large"
+        document.getElementById("loginWindow").innerText = "Oczekiwanie na wybór drugiego gracza"
+    }
+
     changeUIOnLog(userObj) {
         userObj = JSON.parse(userObj)
         document.getElementById("logged").innerHTML = userObj.user

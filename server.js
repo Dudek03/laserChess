@@ -6,6 +6,8 @@ const PORT = 3000;
 app.use(express.static('static'))
 var path = require("path")
 const userController = require("./controllers/userController")
+const databaseController = require("./database/databaseController")
+const data = require("./Data")
 
 //logowanie
 
@@ -33,9 +35,19 @@ app.get("/chosenBoardLen", function(req, res) {
 
 app.get("/chooseFinalBoard", function(req, res){
     let response = userController.chooseFinalBoard()
-    res.send(response)
+    console.log(response, "serwer")
+    console.log(data.finalBboard)
+    res.send(JSON.stringify(response))
 })
 
+//pobranie tablic
+
+app.get("/getTables", function(req, res){
+    let response = databaseController.getTabs()
+})
+
+
+//______________
 app.listen(PORT, function () {
     console.log("start serwera na porcie " + PORT)
 })

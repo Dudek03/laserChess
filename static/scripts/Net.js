@@ -42,6 +42,12 @@ class Net {
             .catch(err => console.log(err))
     }
 
+    getTables() {
+        fetch("/getTables")
+            .then(res => res.text())
+            .catch(err => console.log(err))
+    }
+
 }
 
 export default Net

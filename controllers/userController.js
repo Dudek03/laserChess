@@ -25,7 +25,7 @@ module.exports = {
         //let temp = JSON.parse(data)
         let found = data.chosenBoards.find(e => e.login == req.login)
         if (found) return
-        console.log(req)
+        //console.log(req)
         data.chosenBoards.push(req)
         console.log(data.chosenBoards)
     },
@@ -54,13 +54,13 @@ module.exports = {
         else if(firstPlayerChoice != secondPlayerChoice && (firstPlayerChoice == 'random' || secondPlayerChoice == 'random')){
             if(firstPlayerChoice == 'random')
                 res = data.chosenBoards[1].choice
-            else
+            else if(secondPlayerChoice == 'random')
                 res = data.chosenBoards[0].choice
         }
 
         data.finalBboard = res
 
-        return res
+        return [res]
     }
 
 }
