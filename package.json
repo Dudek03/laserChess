@@ -1,0 +1,20 @@
+{
+  "name": "laserchess",
+  "version": "1.0.0",
+  "description": "school project multiplayer game with 3D graphics.",
+  "main": "Data.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dudek03/laserChess.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dudek03/laserChess/issues"
+  },
+  "homepage": "https://github.com/Dudek03/laserChess#readme"
+}
