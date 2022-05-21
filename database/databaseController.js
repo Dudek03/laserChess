@@ -14,10 +14,9 @@ module.exports = {
 
       coll1.find({
         id: parseInt(data.finalBboard)
-      }, function(err, docs) {
+      }, function (err, docs) {
         if (docs[0])
           resolve(docs[0])
-        // console.log(docs[0].id)
       })
     })
   }

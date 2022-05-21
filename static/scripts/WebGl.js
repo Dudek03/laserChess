@@ -23,13 +23,26 @@ class WebGl {
       10000
     );
 
-    this.camera.position.set(30, 40, 0)
+    this.camera.position.set(30, 100, 20)
     this.camera.lookAt(0, 0, 0);
 
     const controls = new OrbitControls(this.camera, this.renderer.domElement)
     controls.listenToKeyEvents(document.body)
 
     this.render()
+    this.addLight()
+  }
+
+  addLight = () => {
+    const light = new THREE.DirectionalLight(0xffffff, 10)
+    light.position.set(1, 1, 1)
+    light.intensity = 1
+    this.scene.add(light)
+
+    const light2 = new THREE.DirectionalLight(0xffffff, 10)
+    light2.position.set(-1, -1, -1)
+    light2.intensity = 1
+    this.scene.add(light2)
   }
 
   render = () => {

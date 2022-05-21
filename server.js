@@ -44,6 +44,9 @@ app.get("/chooseFinalBoard", function(req, res){
 
 app.get("/getTables", async (req, res) => {
     let response = await databaseController.getTabs()
+    data.board = response.board
+    data.pawns = response.pawns
+    data.rotation = response.rotation
     res.send(JSON.stringify(response))
 })
 

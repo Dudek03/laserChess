@@ -53,9 +53,9 @@ module.exports = {
 
         else if(firstPlayerChoice != secondPlayerChoice && (firstPlayerChoice == 'random' || secondPlayerChoice == 'random')){
             if(firstPlayerChoice == 'random')
-                res = data.chosenBoards[1].choice
+                res = secondPlayerChoice
             else if(secondPlayerChoice == 'random')
-                res = data.chosenBoards[0].choice
+                res = firstPlayerChoice
         }
         else if(data.finalBboard !=  0){
           res = data.finalBboard
