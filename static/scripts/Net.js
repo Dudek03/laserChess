@@ -4,7 +4,6 @@ class Net {
         this.ui = new Ui
     }
 
-
     addPlayer(name) {
         fetch("/addPlayer", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ login: name }) })
             .then(res => res.text())

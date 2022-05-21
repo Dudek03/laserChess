@@ -1,9 +1,8 @@
 import Net from "./Net.js"
 import WebGl from "./WebGl.js"
 import Ui from "./Ui.js"
-import {
-  GLTFLoader
-} from '../libs/GLTFLoader.js';
+import Cube from "./Cube.js"
+import Pawn from "./Pawn.js"
 class Game {
   static instance
   constructor() {
@@ -20,15 +19,10 @@ class Game {
 
     document.getElementById("logOn").addEventListener("click", () => {
       let name = document.getElementById("login").value
-      //let ui = new Ui()
       this.net.addPlayer(name)
       const checklogin = setInterval(async () => {
-        //console.log(await net.checkPlayers())
         if ((await this.net.checkPlayers()).len == 2) {
           clearInterval(checklogin)
-          //this.createPawns()
-          //this.getPawns()
-          //this.createRaycaster()
           this.ui.removeAlert()
           this.ui.displayBoardChoice()
         }
@@ -53,49 +47,79 @@ class Game {
       this.ui.waitForSecondPlayerChoice()
       //PRZEPISAC NA SOCKET !!!
       const checkBoardChoice = setInterval(async () => {
-        //console.log(await net.checkPlayers())
         if ((await this.net.checkChosenBoardLen()).len == 2) {
           clearInterval(checkBoardChoice)
           this.net.chooseFinalBoard()
           this.ui.removeAlert()
-          let dbTable = await this.net.getTables()
-          // console.log(dbTable.board)
-          // console.log(this.webgl)
+          const dbTab = await this.net.getTables()
+          this.pawns = dbTab.pawns
+          this.board = dbTab.board
+          this.rotation = dbTab.rotation
 
-          const light = new THREE.DirectionalLight(0xffffff, 10);
-          light.position.set(1, 1, 1);
-          light.intensity = 1;
-          this.webgl.scene.add(light);
-
-          const light2 = new THREE.DirectionalLight(0xffffff, 10);
-          light2.position.set(-1, -1, -1);
-          light2.intensity = 1;
-          this.webgl.scene.add(light2);
-          this.createChessBoard(dbTable)
+          this.createChessBoard()
+          this.createPawns()
         }
       }, 1000)
     })
   }
-  createChessBoard = async (dbTable) => {
-    for (let i = 0; i < dbTable.board.length; i++) {
-      for (let j = 0; j < dbTable.board[0].length; j++) {
-        let cube = await this.loadModel("./models/pieceMap.glb")
-        // console.log(cube)
-        cube.position.set(-105 + j * 20, 0, -105 + i * 20)
-        this.webgl.scene.add(cube)
+
+  createChessBoard = async () => {
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        let cube = new Cube
+        await cube.init()
+        if (this.board[i][j] == -2) {
+          cube.cube.children[6].material.color.setHex(0xff0000)
+        }
+        else if (this.board[i][j] == -1) {
+          cube.cube.children[6].material.color.setHex(0x0000ff)
+        }
+        cube.cube.position.set(j * 20 - this.board.length / 2 * 20 - 10, 0, i * 20 - this.board.length / 2 * 20)
+        this.webgl.scene.add(cube.cube)
       }
     }
   }
-  loadModel = async (path) => {
-    return new Promise((resolve, reject) => {
-      let loader = new GLTFLoader();
-      let spike = loader.load(path, async (glb) => {
-        glb.scene.scale.set(10,10,10)
-        console.log(glb.scene)
-        resolve(glb.scene)
-      })
-    })
+
+  createPawns = async () => {
+    let pawn
+    for(let i = 0; i < this.pawns.length; i++){
+      for(let j = 0; j < this.pawns[i].length; j++){
+        if(this.pawns[i][j] == 0) continue
+        else if(this.pawns[i][j] == 1000 || this.pawns[i][j] == 2000){
+          pawn = new Pawn
+          await pawn.init("laser")
+        }
+        else if(this.pawns[i][j] == 1 || this.pawns[i][j] == 101){
+          pawn = new Pawn
+          await pawn.init("king")
+        }
+        else if(this.pawns[i][j] == 2 || this.pawns[i][j] == 102){
+          pawn = new Pawn
+          await pawn.init("shelder")
+        }
+        else if(this.pawns[i][j] == 3 || this.pawns[i][j] == 103){
+          pawn = new Pawn
+          await pawn.init("shield")
+        }
+        else if(this.pawns[i][j] == 4 || this.pawns[i][j] == 104){
+          pawn = new Pawn
+          await pawn.init("disruptor")
+        }
+        else if(this.pawns[i][j] == 5 || this.pawns[i][j] == 105){
+          pawn = new Pawn
+          await pawn.init("spike")
+        }
+        else if(this.pawns[i][j] == 6 || this.pawns[i][j] == 106){
+          pawn = new Pawn
+          await pawn.init("sentry")
+        }
+        
+        pawn.pawn.position.set(j * 20 - this.board.length / 2 * 20 - 10, 0, i * 20 - this.board.length / 2 * 20)
+        this.webgl.scene.add(pawn.pawn)
+      }
+    }
   }
+
 }
 
 export default Game
