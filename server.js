@@ -42,8 +42,9 @@ app.get("/chooseFinalBoard", function(req, res){
 
 //pobranie tablic
 
-app.get("/getTables", function(req, res){
-    let response = databaseController.getTabs()
+app.get("/getTables", async (req, res) => {
+    let response = await databaseController.getTabs()
+    res.send(JSON.stringify(response))
 })
 
 
