@@ -43,9 +43,10 @@ class Net {
     }
 
     getTables() {
-        fetch("/getTables")
-            .then(res => res.text())
+        let data = fetch("/getTables")
+            .then(res => res.json())
             .catch(err => console.log(err))
+        return data;
     }
 
 }

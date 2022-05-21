@@ -12,7 +12,7 @@ class Data{
 
     static chosenBoards = []
 
-    static finalBboard
+    static finalBboard = 0
 
 }
 
