@@ -16,8 +16,8 @@ class Pawn extends THREE.Object3D {
         return new Promise((resolve, reject) => {
             let loader = new GLTFLoader();
             loader.load(`./models/${name}.glb`, async (glb) => {
-                console.log(glb.scene)
-                glb.scene.scale.set(10, 10, 10)
+                glb.scene.scale.set(5, 5, 5)
+                // console.log(glb.scene);
                 resolve(glb.scene)
             })
         })

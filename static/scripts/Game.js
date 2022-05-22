@@ -84,7 +84,8 @@ class Game {
     let pawn
     for(let i = 0; i < this.pawns.length; i++){
       for(let j = 0; j < this.pawns[i].length; j++){
-        if(this.pawns[i][j] == 0) continue
+        if(this.pawns[i][j] == 0)
+          continue
         else if(this.pawns[i][j] == 1000 || this.pawns[i][j] == 2000){
           pawn = new Pawn
           await pawn.init("laser")
@@ -92,6 +93,8 @@ class Game {
         else if(this.pawns[i][j] == 1 || this.pawns[i][j] == 101){
           pawn = new Pawn
           await pawn.init("king")
+
+          // if(this.pawns[i][j] == 101)
         }
         else if(this.pawns[i][j] == 2 || this.pawns[i][j] == 102){
           pawn = new Pawn
@@ -113,8 +116,8 @@ class Game {
           pawn = new Pawn
           await pawn.init("sentry")
         }
-        
-        pawn.pawn.position.set(j * 20 - this.board.length / 2 * 20 - 10, 0, i * 20 - this.board.length / 2 * 20)
+
+        pawn.pawn.position.set(j * 20 - this.board.length / 2 * 20 - 10, 20, i * 20 - this.board.length / 2 * 20)
         this.webgl.scene.add(pawn.pawn)
       }
     }
