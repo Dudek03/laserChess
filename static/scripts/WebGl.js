@@ -15,7 +15,7 @@ class WebGl {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("root").append(this.renderer.domElement);
     this.axes = new THREE.AxesHelper(1000)
-    this.scene.add(this.axes)
+    //this.scene.add(this.axes)
     this.camera = new THREE.PerspectiveCamera(
       60,
       window.innerWidth / window.innerHeight,
