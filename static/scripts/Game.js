@@ -69,12 +69,11 @@ class Game {
         let cube = new Cube
         await cube.init()
         if (this.board[i][j] == -2) {
-          cube.cube.children[6].material.color.setHex(0xff0000)
+          cube.cube.children[6].material.color.setHex(0xb00a0a)
+        } else if (this.board[i][j] == -1) {
+          cube.cube.children[6].material.color.setHex(0x0a0ab0)
         }
-        else if (this.board[i][j] == -1) {
-          cube.cube.children[6].material.color.setHex(0x0000ff)
-        }
-        cube.cube.position.set(j * 20 - this.board.length / 2 * 20 - 10, 0, i * 20 - this.board.length / 2 * 20)
+        cube.cube.position.set(j * 20 - this.board.length / 2 * 20, 0, i * 20 - this.board.length / 2 * 20)
         this.webgl.scene.add(cube.cube)
       }
     }
@@ -82,42 +81,64 @@ class Game {
 
   createPawns = async () => {
     let pawn
-    for(let i = 0; i < this.pawns.length; i++){
-      for(let j = 0; j < this.pawns[i].length; j++){
-        if(this.pawns[i][j] == 0)
+    for (let i = 0; i < this.pawns.length; i++) {
+      for (let j = 0; j < this.pawns[i].length; j++) {
+        if (this.pawns[i][j] == 0)
           continue
-        else if(this.pawns[i][j] == 1000 || this.pawns[i][j] == 2000){
+        else if (this.pawns[i][j] == 1000 || this.pawns[i][j] == 2000) {
           pawn = new Pawn
           await pawn.init("laser")
-        }
-        else if(this.pawns[i][j] == 1 || this.pawns[i][j] == 101){
+          if (this.pawns[i][j] == 1000)
+            pawn.pawn.children[1].children[1].material.color.setHex(0x0a0ab0)
+          else
+            pawn.pawn.children[1].children[1].material.color.setHex(0xb00a0a)
+        } else if (this.pawns[i][j] == 1 || this.pawns[i][j] == 101) {
           pawn = new Pawn
           await pawn.init("king")
-
-          // if(this.pawns[i][j] == 101)
-        }
-        else if(this.pawns[i][j] == 2 || this.pawns[i][j] == 102){
+          if (this.pawns[i][j] == 1)
+            pawn.pawn.children[1].material.color.setHex(0x0a0ab0)
+          else
+            pawn.pawn.children[1].material.color.setHex(0xb00a0a)
+        } else if (this.pawns[i][j] == 2 || this.pawns[i][j] == 102) {
           pawn = new Pawn
           await pawn.init("shelder")
-        }
-        else if(this.pawns[i][j] == 3 || this.pawns[i][j] == 103){
+          if (this.pawns[i][j] == 2)
+            pawn.pawn.children[1].material.color.setHex(0x0a0ab0)
+          else
+            pawn.pawn.children[1].material.color.setHex(0xb00a0a)
+
+        } else if (this.pawns[i][j] == 3 || this.pawns[i][j] == 103) {
           pawn = new Pawn
           await pawn.init("shield")
-        }
-        else if(this.pawns[i][j] == 4 || this.pawns[i][j] == 104){
+          if (this.pawns[i][j] == 3)
+            pawn.pawn.children[2].material.color.setHex(0x0a0ab0)
+          else
+            pawn.pawn.children[2].material.color.setHex(0xb00a0a)
+        } else if (this.pawns[i][j] == 4 || this.pawns[i][j] == 104) {
           pawn = new Pawn
           await pawn.init("disruptor")
-        }
-        else if(this.pawns[i][j] == 5 || this.pawns[i][j] == 105){
+          if (this.pawns[i][j] == 4)
+            pawn.pawn.children[1].material.color.setHex(0x0a0ab0)
+          else
+            pawn.pawn.children[1].material.color.setHex(0xb00a0a)
+
+        } else if (this.pawns[i][j] == 5 || this.pawns[i][j] == 105) {
           pawn = new Pawn
-          await pawn.init("spike")
-        }
-        else if(this.pawns[i][j] == 6 || this.pawns[i][j] == 106){
+          await pawn.init("mirror")
+          if (this.pawns[i][j] == 5)
+            pawn.pawn.children[1].material.color.setHex(0x0a0ab0)
+          else
+            pawn.pawn.children[1].material.color.setHex(0xb00a0a)
+        } else if (this.pawns[i][j] == 6 || this.pawns[i][j] == 106) {
           pawn = new Pawn
           await pawn.init("sentry")
+          if (this.pawns[i][j] == 6)
+            pawn.pawn.children[3].material.color.setHex(0x0a0ab0)
+          else
+            pawn.pawn.children[3].material.color.setHex(0xb00a0a)
         }
 
-        pawn.pawn.position.set(j * 20 - this.board.length / 2 * 20 - 10, 20, i * 20 - this.board.length / 2 * 20)
+        pawn.pawn.position.set(j * 20 - this.board.length / 2 * 20, 20, i * 20 - this.board.length / 2 * 20)
         this.webgl.scene.add(pawn.pawn)
       }
     }
