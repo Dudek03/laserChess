@@ -46,7 +46,7 @@ app.get("/getTables", async (req, res) => {
     let response = await databaseController.getTabs()
     data.board = response.board
     data.pawns = response.pawns
-    data.rotation = response.rotation
+    data.rotation = response.rotations
     res.send(JSON.stringify(response))
 })
 

@@ -54,8 +54,7 @@ class Game {
           const dbTab = await this.net.getTables()
           this.pawns = dbTab.pawns
           this.board = dbTab.board
-          this.rotation = dbTab.rotation
-
+          this.rotation = dbTab.rotations
           this.createChessBoard()
           this.createPawns()
         }
@@ -139,6 +138,7 @@ class Game {
         }
 
         pawn.pawn.position.set(j * 20 - this.board.length / 2 * 20, 20, i * 20 - this.board.length / 2 * 20)
+        pawn.pawn.rotation.y = this.rotation[i][j] * Math.PI/2 * -1
         this.webgl.scene.add(pawn.pawn)
       }
     }
