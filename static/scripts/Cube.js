@@ -5,6 +5,7 @@ class Cube extends THREE.Object3D{
 
   constructor() {
     super()
+    this.name = "hehe"
   }
 
   init = async () => {
@@ -18,6 +19,7 @@ class Cube extends THREE.Object3D{
       loader.load("./models/pieceMap.glb", async (glb) => {
         //example = glb.scene
         glb.scene.scale.set(10, 10, 10)
+        glb.scene.children[0].name = "cube"
         resolve(glb.scene)
       })
     })

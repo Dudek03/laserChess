@@ -2,7 +2,7 @@ var express = require("express")
 var app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
-const PORT = 3000;
+const PORT = 4000;
 app.use(express.static('static'))
 var path = require("path")
 const userController = require("./controllers/userController")
