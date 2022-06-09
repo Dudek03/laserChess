@@ -6,6 +6,7 @@ class Pawn extends THREE.Object3D {
 
   constructor() {
     super()
+    this.name = "pawn"
   }
 
   init = async (name) => {
@@ -17,10 +18,13 @@ class Pawn extends THREE.Object3D {
       let loader = new GLTFLoader();
       loader.load(`./models/${name}.glb`, async (glb) => {
         glb.scene.scale.set(5, 5, 5)
-        // console.log(glb.scene);
         resolve(glb.scene)
       })
     })
+  }
+
+  setName = (name) =>{
+    this.name = name
   }
 }
 

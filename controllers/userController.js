@@ -46,7 +46,7 @@ module.exports = {
         else if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice != 'random')
             res = data.chosenBoards[0].choice
 
-        else if (firstPlayerChoice != secondPlayerChoice && firstPlayerChoice != 'random' && firstPlayerChoice != 'random') {
+        else if (firstPlayerChoice != secondPlayerChoice && firstPlayerChoice != 'random' && secondPlayerChoice != 'random') {
             let temp = Math.floor(Math.random() * 2)
             res = data.chosenBoards[temp].choice
         }
@@ -57,10 +57,10 @@ module.exports = {
             else if(secondPlayerChoice == 'random')
                 res = firstPlayerChoice
         }
+        
         else if(data.finalBboard !=  0){
           res = data.finalBboard
         }
-
         data.finalBboard = res
 
         return [res]
