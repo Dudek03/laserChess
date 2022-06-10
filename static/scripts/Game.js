@@ -112,12 +112,15 @@ class Game {
         else if (this.pawns[i][j] == 6 || this.pawns[i][j] == 106)
           await pawn.init("sentry")
 
-        if (this.pawns[i][j] == 1000 || (this.pawns[i][j] > 0 && this.pawns[i][j] < 100))
+        if (this.pawns[i][j] == 1000 || (this.pawns[i][j] > 0 && this.pawns[i][j] < 100)){
           pawn.pawn.children[1].material.color.setHex(0x0a0ab0)
-        if (this.pawns[i][j] == 2000 || (this.pawns[i][j] > 100 && this.pawns[i][j] < 1000))
+          pawn.pawn.children[0].name += "-Blue"
+        }
+        if (this.pawns[i][j] == 2000 || (this.pawns[i][j] > 100 && this.pawns[i][j] < 1000)){
           pawn.pawn.children[1].material.color.setHex(0xb00a0a)
-        
-        //pawn.pawn.position.set(j * 20 - this.board.length / 2 * 20, 20, i * 20 - this.board.length / 2 * 20)
+          pawn.pawn.children[0].name += "-Red"
+        }
+          
         pawn.pawn.position.set(j * 20 - this.board.length * 10, 20, (i - this.board.length / 2) *20)
         pawn.pawn.rotation.y = this.rotation[i][j] * Math.PI / 2 * -1
         this.webgl.scene.add(pawn.pawn)
@@ -140,28 +143,28 @@ class Game {
           const CLICKEDNAME = clickedPawn.children[0].name
           console.log(CLICKEDCOLOR.r, "ray", CLICKEDCOLOR.b, CLICKEDNAME)
           console.log(clickedPawn)
-          if(this.clicked && (this.clicked.children[1].material.color.r > 0.69 && CLICKEDCOLOR.r > 0.69 || this.clicked.children[1].material.color.b > 0.69 && CLICKEDCOLOR.b > 0.69)){
-            if(this.clicked.children[1].material.color.r > 0.69)
+          if(this.clicked && (this.clicked.children[0].name.split("-")[1] == "Red" && CLICKEDNAME.split("-")[1] == "Red" || this.clicked.children[0].name.split("-")[1] == "Blue" && CLICKEDNAME.split("-")[1] == "Blue")){
+            if(this.clicked.children[0].name.split("-")[1] == "Red")
               this.clicked.children[1].material.color.setHex(0xb00a0a)
-            else 
+            
+            if(this.clicked.children[0].name.split("-")[1] == "Blue")
               this.clicked.children[1].material.color.setHex(0x0a0ab0)
+              
             let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
             greenCubes.forEach(e => {e.children[6].material.color.setHex(0x242424)})
           }
-          if(this.clicked && CLICKEDNAME == 'Cube' && CLICKEDCOLOR.g == 1)
-            console.log("lmao zamien to nizej")
+          if(this.clicked && CLICKEDNAME == 'cube' && CLICKEDCOLOR.g == 1)
+            console.log("Potem usune ten console log ale na razie jest potrzebny")
             //this.move(clickedPawn.position)
           if(Ui.player.len == 1 && CLICKEDCOLOR.b > 0.69 /*&& Game.playerTurn == true*/){
-            if(clickedPawn == this.clicked)
+            if(clickedPawn == this.clicked || CLICKEDNAME == "cube")
               return
-            console.log("gracz 1")
             this.clicked = clickedPawn
             this.moveValidator()
           }
           else if(Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 /*&& Game.playerTurn == false*/){
-            if(clickedPawn == this.clicked)
+            if(clickedPawn == this.clicked || CLICKEDNAME == "cube")
               return
-              console.log("gracz 2")
             this.clicked = clickedPawn
             this.moveValidator()
           }
