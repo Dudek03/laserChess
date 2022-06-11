@@ -5,15 +5,15 @@ class WebGl {
   static instance
   constructor() {
     WebGl.instance = this
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.1, 10000);
+    this.scene = new THREE.Scene()
+    this.camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.1, 10000)
     this.renderer = new THREE.WebGLRenderer({
       alpha: true,
       antialias: true
-    });;
-    this.renderer.setClearColor(0x242424);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById("root").append(this.renderer.domElement);
+    })
+    this.renderer.setClearColor(0x242424)
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    document.getElementById("root").append(this.renderer.domElement)
     this.axes = new THREE.AxesHelper(1000)
     //this.scene.add(this.axes)
     this.camera = new THREE.PerspectiveCamera(
@@ -24,7 +24,7 @@ class WebGl {
     );
 
     this.camera.position.set(30, 100, 20)
-    this.camera.lookAt(0, 0, 0);
+    this.camera.lookAt(0, 0, 0)
 
     const controls = new OrbitControls(this.camera, this.renderer.domElement)
     controls.listenToKeyEvents(document.body)
@@ -46,16 +46,17 @@ class WebGl {
   }
 
   render = () => {
-    requestAnimationFrame(this.render);
-    this.renderer.render(this.scene, this.camera);
+    requestAnimationFrame(this.render)
+    this.renderer.render(this.scene, this.camera)
     //console.log("render leci")
-    window.addEventListener('resize', this.onWindowResize.bind(this), false);
+    window.addEventListener('resize', this.onWindowResize.bind(this), false)
+    //TWEEN.update()
   }
 
   onWindowResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.camera.aspect = window.innerWidth / window.innerHeight
+    this.camera.updateProjectionMatrix()
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
   }
 }
 

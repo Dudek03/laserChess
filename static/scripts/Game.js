@@ -13,6 +13,8 @@ class Game {
     this.webgl = new WebGl
     this.ui = new Ui
     this.cubesTable = []
+    this.pawnTable = []
+    this.arrowChoice = document.querySelectorAll(".arrowChoice")
     this.createListeners()
   }
 
@@ -41,6 +43,14 @@ class Game {
       e.addEventListener("click", () => {
         playerChoice = e.attributes[1].value
         console.log(playerChoice)
+      })
+    })
+
+    this.arrowChoice.forEach(e => {
+      e.addEventListener("click", () => {
+        let rotation = e.attributes[2].value
+        this.move(rotation)
+        //console.log(rotation)
       })
     })
 
@@ -79,7 +89,6 @@ class Game {
         await cube.init()
         if (this.board[i][j] == -2) {
           cube.cube.children[6].material.color.setHex(0xb00a0a)
-          ///cube.cube.name = "lmao"
         } else if (this.board[i][j] == -1) {
           cube.cube.children[6].material.color.setHex(0x0a0ab0)
         }
@@ -97,9 +106,9 @@ class Game {
         let pawn = new Pawn
         if (this.pawns[i][j] == 0)
           continue
-        else if (this.pawns[i][j] == 1000 || this.pawns[i][j] == 2000) 
+        else if (this.pawns[i][j] == 1000 || this.pawns[i][j] == 2000)
           await pawn.init("laser")
-        else if (this.pawns[i][j] == 1 || this.pawns[i][j] == 101) 
+        else if (this.pawns[i][j] == 1 || this.pawns[i][j] == 101)
           await pawn.init("king")
         else if (this.pawns[i][j] == 2 || this.pawns[i][j] == 102)
           await pawn.init("shelder")
@@ -112,17 +121,18 @@ class Game {
         else if (this.pawns[i][j] == 6 || this.pawns[i][j] == 106)
           await pawn.init("sentry")
 
-        if (this.pawns[i][j] == 1000 || (this.pawns[i][j] > 0 && this.pawns[i][j] < 100)){
+        if (this.pawns[i][j] == 1000 || (this.pawns[i][j] > 0 && this.pawns[i][j] < 100)) {
           pawn.pawn.children[1].material.color.setHex(0x0a0ab0)
           pawn.pawn.children[0].name += "-Blue"
         }
-        if (this.pawns[i][j] == 2000 || (this.pawns[i][j] > 100 && this.pawns[i][j] < 1000)){
+        if (this.pawns[i][j] == 2000 || (this.pawns[i][j] > 100 && this.pawns[i][j] < 1000)) {
           pawn.pawn.children[1].material.color.setHex(0xb00a0a)
           pawn.pawn.children[0].name += "-Red"
         }
-          
-        pawn.pawn.position.set(j * 20 - this.board.length * 10, 20, (i - this.board.length / 2) *20)
+
+        pawn.pawn.position.set(j * 20 - this.board.length * 10, 20, (i - this.board.length / 2) * 20)
         pawn.pawn.rotation.y = this.rotation[i][j] * Math.PI / 2 * -1
+        this.pawnTable.push(pawn.pawn)
         this.webgl.scene.add(pawn.pawn)
       }
     }
@@ -141,29 +151,42 @@ class Game {
           if (clickedPawn.name != "Scene") return
           const CLICKEDCOLOR = clickedPawn.children[1].material.color
           const CLICKEDNAME = clickedPawn.children[0].name
-          console.log(CLICKEDCOLOR.r, "ray", CLICKEDCOLOR.b, CLICKEDNAME)
-          console.log(clickedPawn)
-          if(this.clicked && (this.clicked.children[0].name.split("-")[1] == "Red" && CLICKEDNAME.split("-")[1] == "Red" || this.clicked.children[0].name.split("-")[1] == "Blue" && CLICKEDNAME.split("-")[1] == "Blue")){
-            if(this.clicked.children[0].name.split("-")[1] == "Red")
+          
+          //console.log(CLICKEDCOLOR.r, "ray", CLICKEDCOLOR.b, CLICKEDNAME)
+          //console.log(clickedPawn)
+          // if (this.clicked) {
+          //   this.arrowChoice.forEach(e => {
+          //     e.addEventListener("click", () => {
+          //       let rotation = e.attributes[2].value
+          //       this.move(rotation)
+          //     })
+          //   })
+          // }
+
+          if (this.clicked && (this.clicked.children[0].name.split("-")[1] == "Red" && CLICKEDNAME.split("-")[1] == "Red" || this.clicked.children[0].name.split("-")[1] == "Blue" && CLICKEDNAME.split("-")[1] == "Blue")) {
+            this.ui.hideArrows()
+            if (this.clicked.children[0].name.split("-")[1] == "Red")
               this.clicked.children[1].material.color.setHex(0xb00a0a)
-            
-            if(this.clicked.children[0].name.split("-")[1] == "Blue")
+
+            if (this.clicked.children[0].name.split("-")[1] == "Blue")
               this.clicked.children[1].material.color.setHex(0x0a0ab0)
-              
+
             let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
-            greenCubes.forEach(e => {e.children[6].material.color.setHex(0x242424)})
+            greenCubes.forEach(e => { e.children[6].material.color.setHex(0x242424) })
+            //this.clicked = null
           }
-          if(this.clicked && CLICKEDNAME == 'cube' && CLICKEDCOLOR.g == 1)
-            console.log("Potem usune ten console log ale na razie jest potrzebny")
-            //this.move(clickedPawn.position)
-          if(Ui.player.len == 1 && CLICKEDCOLOR.b > 0.69 /*&& Game.playerTurn == true*/){
-            if(clickedPawn == this.clicked || CLICKEDNAME == "cube")
+          if (this.clicked && CLICKEDNAME == 'cube' && clickedPawn.children[6].material.color.g == 1 && clickedPawn.children[6].material.color.r == 0 && clickedPawn.children[6].material.color.b == 0) {
+            this.move(clickedPawn.position)
+          }
+
+          if (Ui.player.len == 1 && CLICKEDCOLOR.b > 0.69 /*&& Game.playerTurn == true*/) {
+            if (clickedPawn == this.clicked || CLICKEDNAME == "cube")
               return
             this.clicked = clickedPawn
             this.moveValidator()
           }
-          else if(Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 /*&& Game.playerTurn == false*/){
-            if(clickedPawn == this.clicked || CLICKEDNAME == "cube")
+          else if (Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 /*&& Game.playerTurn == false*/) {
+            if (clickedPawn == this.clicked || CLICKEDNAME == "cube")
               return
             this.clicked = clickedPawn
             this.moveValidator()
@@ -173,11 +196,114 @@ class Game {
     }
   }
 
-  moveValidator(){
+  moveValidator() {
+    if (!this.clicked) return
+    console.log(this.clicked)
+    const THISCLICKEDNAME = this.clicked.children[0].name.split("-")
+    let foundCube
+    let cubesToCHange = []
     let x = (this.clicked.position.x + this.board.length * 10) / 20
     let y = (this.clicked.position.z + this.board.length * 10) / 20
-    //console.log(x, y)
+    console.log(x, y, "pozycja", THISCLICKEDNAME[0])
     this.clicked.children[1].material.color.setHex(0xede907)
+    this.ui.displayArrows()
+    if (THISCLICKEDNAME[0] == "laser") return
+    if (y + 1 <= this.board.length - 1 && y + 1 >= 0) {
+      if (this.pawns[y + 1][x] == 0 && (THISCLICKEDNAME[1] == "Red" && this.board[y + 1][x] != -1 || THISCLICKEDNAME[1] == "Blue" && this.board[y + 1][x] != -2)) {
+        foundCube = this.cubesTable.find(e => e.position.x == (x - this.board.length / 2) * 20 && e.position.z == ((y + 1) - this.board.length / 2) * 20)
+        cubesToCHange.push(foundCube)
+      }
+    }
+    if (y - 1 <= this.board.length - 1 && y - 1 >= 0) {
+      if (this.pawns[y - 1][x] == 0 && (THISCLICKEDNAME[1] == "Red" && this.board[y - 1][x] != -1 || THISCLICKEDNAME[1] == "Blue" && this.board[y - 1][x] != -2)) {
+        foundCube = this.cubesTable.find(e => e.position.x == (x - this.board.length / 2) * 20 && e.position.z == ((y - 1) - this.board.length / 2) * 20)
+        cubesToCHange.push(foundCube)
+      }
+    }
+    if (x + 1 <= this.board[y].length - 1 && x + 1 >= 0) {
+      for (let i = -1; i < 2; i++) {
+        if (y + i <= this.board.length - 1 && y + i >= 0) {
+          if (this.pawns[y + i][x + 1] == 0 && (THISCLICKEDNAME[1] == "Red" && this.board[y + i][x + 1] != -1 || THISCLICKEDNAME[1] == "Blue" && this.board[y + i][x + 1] != -2)) {
+            foundCube = this.cubesTable.find(e => e.position.x == ((x + 1) - this.board.length / 2) * 20 && e.position.z == ((y + i) - this.board.length / 2) * 20)
+            cubesToCHange.push(foundCube)
+          }
+        }
+      }
+    }
+    if (x - 1 <= this.board[y].length - 1 && x - 1 >= 0) {
+      for (let i = -1; i < 2; i++) {
+        if (y + i <= this.board.length - 1 && y + i >= 0) {
+          if (this.pawns[y + i][x - 1] == 0 && (THISCLICKEDNAME[1] == "Red" && this.board[y + i][x - 1] != -1 || THISCLICKEDNAME[1] == "Blue" && this.board[y + i][x - 1] != -2)) {
+            foundCube = this.cubesTable.find(e => e.position.x == ((x - 1) - this.board.length / 2) * 20 && e.position.z == ((y + i) - this.board.length / 2) * 20)
+            cubesToCHange.push(foundCube)
+          }
+        }
+      }
+    }
+
+    cubesToCHange.forEach(e => { e.children[6].material.color.setHex(0x00ff00) })
+    
+  }
+
+  move(pos) {
+    let modelNum
+    let positions = {
+      color: this.clicked.children[0].name.split("-")[1],
+      oldX: (this.clicked.position.x + this.board.length * 10) / 20,
+      oldZ: (this.clicked.position.z + this.board.length * 10) / 20
+    }
+    this.ui.hideArrows()
+    if (this.clicked.children[0].name.split("-")[1] == "Red")
+      this.clicked.children[1].material.color.setHex(0xb00a0a)
+
+    if (this.clicked.children[0].name.split("-")[1] == "Blue")
+      this.clicked.children[1].material.color.setHex(0x0a0ab0)
+
+    let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
+    greenCubes.forEach(e => { e.children[6].material.color.setHex(0x242424) })
+
+    console.log(pos, "move")
+    if (typeof (pos) == "string") {
+      let rotation
+      if(pos == "left")
+        rotation = -1
+      else if(pos == "right")
+        rotation = 1
+      positions.newX = "none"
+      positions.newZ = "none"
+      positions.rotation = rotation
+      this.rotation[positions.oldZ][positions.oldX] += rotation
+      this.clicked.rotation.y = this.rotation[positions.oldZ][positions.oldX] * Math.PI / 2 * -1
+      
+    }
+    else if (typeof (pos) == "object") {
+      positions.newX = (pos.x + this.board.length * 10) / 20,
+        positions.newZ = (pos.z + this.board.length * 10) / 20,
+        positions.rotation = "none"
+      // new TWEEN.Tween(this.clicked.position)
+      //       .to({ x: pos.x, y: 20, z: pos.z }, 200)
+      //       .easing(TWEEN.Easing.Quadratic.Out)
+      //       .start()
+      this.clicked.position.x = pos.x
+      this.clicked.position.z = pos.z
+      modelNum = this.pawns[positions.oldZ][positions.oldX]
+      this.pawns[positions.oldZ][positions.oldX] = 0
+      this.pawns[positions.newZ][positions.newX] = modelNum
+      
+    }
+    this.clicked = null
+    this.laserShoot()
+    this.net.playerMove(positions)
+  }
+
+  checkForChanges = async () => {
+    let serverPawns = await this.net.getPawnsPosition()
+    let serverRotations = await this.net.getPawnsRotation()
+
+  }
+
+  laserShoot(){
+    console.log("pew pew")
   }
 
 }

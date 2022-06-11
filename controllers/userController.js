@@ -51,19 +51,31 @@ module.exports = {
             res = data.chosenBoards[temp].choice
         }
 
-        else if(firstPlayerChoice != secondPlayerChoice && (firstPlayerChoice == 'random' || secondPlayerChoice == 'random')){
-            if(firstPlayerChoice == 'random')
+        else if (firstPlayerChoice != secondPlayerChoice && (firstPlayerChoice == 'random' || secondPlayerChoice == 'random')) {
+            if (firstPlayerChoice == 'random')
                 res = secondPlayerChoice
-            else if(secondPlayerChoice == 'random')
+            else if (secondPlayerChoice == 'random')
                 res = firstPlayerChoice
         }
-        
-        else if(data.finalBboard !=  0){
-          res = data.finalBboard
+
+        else if (data.finalBboard != 0) {
+            res = data.finalBboard
         }
         data.finalBboard = res
 
         return [res]
+    },
+
+    playerMove: (pos) => {
+        console.log(pos)
+        if (pos.newX == "none" && pos.newZ == "none") {
+            data.rotation[pos.oldZ][pos.oldX] += pos.rotation
+        }
+        else if (pos.rotation == "none") {
+            modelNum = data.pawns[pos.oldZ][pos.oldX]
+            data.pawns[pos.oldZ][pos.oldX] = 0
+            data.pawns[pos.oldZ][pos.newX] = modelNum
+        }
     }
 
 }
