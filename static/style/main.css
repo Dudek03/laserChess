@@ -61,3 +61,19 @@ body{
     margin-top: 20px;
 }
 
+#arrows{
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    bottom: 1px;
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+    color: white;
+    font-size: xx-large;
+}
+#arrows > div{
+    border: 2px solid white;
+    padding: 10px;
+}
+
