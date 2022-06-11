@@ -3,10 +3,12 @@ import WebGl from "./WebGl.js"
 import Ui from "./Ui.js"
 import Cube from "./Cube.js"
 import Pawn from "./Pawn.js"
+import LaserBeam from './Laser.js'
 class Game {
   static instance
   static playerTurn
   constructor() {
+    this.objectArray = []
     Game.instance = this
     Game.playerTurn = true
     this.net = new Net
@@ -61,6 +63,14 @@ class Game {
           this.createChessBoard()
           this.createPawns()
           this.createRaycaster()
+          this.LaserBeam = new LaserBeam({
+            reflectMax: 10
+          });
+          this.add2Scene(this.LaserBeam);
+          this.LaserBeam2 = new LaserBeam({
+            reflectMax: 10
+          });
+          this.add2Scene(this.LaserBeam2);
         }
       }, 1000)
     })
@@ -91,15 +101,17 @@ class Game {
   }
 
   createPawns = async () => {
-
+    this.objectArray = [];
+    let count = 0;
+    let much = 0;
     for (let i = 0; i < this.pawns.length; i++) {
       for (let j = 0; j < this.pawns[i].length; j++) {
         let pawn = new Pawn
         if (this.pawns[i][j] == 0)
           continue
-        else if (this.pawns[i][j] == 1000 || this.pawns[i][j] == 2000) 
+        else if (this.pawns[i][j] == 1000 || this.pawns[i][j] == 2000)
           await pawn.init("laser")
-        else if (this.pawns[i][j] == 1 || this.pawns[i][j] == 101) 
+        else if (this.pawns[i][j] == 1 || this.pawns[i][j] == 101)
           await pawn.init("king")
         else if (this.pawns[i][j] == 2 || this.pawns[i][j] == 102)
           await pawn.init("shelder")
@@ -112,17 +124,58 @@ class Game {
         else if (this.pawns[i][j] == 6 || this.pawns[i][j] == 106)
           await pawn.init("sentry")
 
+        pawn.pawn.children.forEach((item, i) => {
+          count++;
+          if (item.type.trim() == "Mesh" && item.name != "shelder") {
+            this.objectArray.push(item);
+            console.log(item)
+            much++;
+          }
+          // else{
+            // item.children.forEach(meshInside =>{
+            //   if(meshInside.type.trim() == "Mesh")
+            //   this.objectArray.push(meshInside)
+            // })
+            // console.log(item)
+          // }
+          //
+          // if (item.type.trim() == "Group")
+          // item.children.forEach(mesh => {
+          //   this.objectArray.push(mesh);
+          //   much++;
+          // })
+        });
         if (this.pawns[i][j] == 1000 || (this.pawns[i][j] > 0 && this.pawns[i][j] < 100))
           pawn.pawn.children[1].material.color.setHex(0x0a0ab0)
         if (this.pawns[i][j] == 2000 || (this.pawns[i][j] > 100 && this.pawns[i][j] < 1000))
           pawn.pawn.children[1].material.color.setHex(0xb00a0a)
-        
+
         //pawn.pawn.position.set(j * 20 - this.board.length / 2 * 20, 20, i * 20 - this.board.length / 2 * 20)
-        pawn.pawn.position.set(j * 20 - this.board.length * 10, 20, (i - this.board.length / 2) *20)
-        pawn.pawn.rotation.y = this.rotation[i][j] * Math.PI / 2 * -1
+        pawn.pawn.position.set(j * 20 - this.board.length * 10, 20, (i - this.board.length / 2) * 20)
+        pawn.pawn.rotation.y = this.rotation[i][j] * Math.PI/2  * -1
         this.webgl.scene.add(pawn.pawn)
+
       }
     }
+    //red
+    this.LaserBeam.object3d.position.set(-80, 30, -90)
+    this.LaserBeam.intersect(
+      new THREE.Vector3(0, 0, 40),
+      this.objectArray
+    );
+    //blue
+    this.LaserBeam2.object3d.position.set(100, 30, 60)
+    this.LaserBeam2.intersect(
+      new THREE.Vector3(0, 0, -40),
+      this.objectArray
+    );
+    // dziala
+    // this.LaserBeam2.intersect(
+    //   new THREE.Vector3(0.3, 0, -40),
+    //   this.objectArray
+    // );
+    // console.log(count)
+    // console.log(much)
   }
 
   raycast(e) {
@@ -140,28 +193,29 @@ class Game {
           const CLICKEDNAME = clickedPawn.children[0].name
           console.log(CLICKEDCOLOR.r, "ray", CLICKEDCOLOR.b, CLICKEDNAME)
           console.log(clickedPawn)
-          if(this.clicked && (this.clicked.children[1].material.color.r > 0.69 && CLICKEDCOLOR.r > 0.69 || this.clicked.children[1].material.color.b > 0.69 && CLICKEDCOLOR.b > 0.69)){
-            if(this.clicked.children[1].material.color.r > 0.69)
+          if (this.clicked && (this.clicked.children[1].material.color.r > 0.69 && CLICKEDCOLOR.r > 0.69 || this.clicked.children[1].material.color.b > 0.69 && CLICKEDCOLOR.b > 0.69)) {
+            if (this.clicked.children[1].material.color.r > 0.69)
               this.clicked.children[1].material.color.setHex(0xb00a0a)
-            else 
+            else
               this.clicked.children[1].material.color.setHex(0x0a0ab0)
             let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
-            greenCubes.forEach(e => {e.children[6].material.color.setHex(0x242424)})
+            greenCubes.forEach(e => {
+              e.children[6].material.color.setHex(0x242424)
+            })
           }
-          if(this.clicked && CLICKEDNAME == 'Cube' && CLICKEDCOLOR.g == 1)
+          if (this.clicked && CLICKEDNAME == 'Cube' && CLICKEDCOLOR.g == 1)
             console.log("lmao zamien to nizej")
-            //this.move(clickedPawn.position)
-          if(Ui.player.len == 1 && CLICKEDCOLOR.b > 0.69 /*&& Game.playerTurn == true*/){
-            if(clickedPawn == this.clicked)
+          //this.move(clickedPawn.position)
+          if (Ui.player.len == 1 && CLICKEDCOLOR.b > 0.69 /*&& Game.playerTurn == true*/ ) {
+            if (clickedPawn == this.clicked)
               return
             console.log("gracz 1")
             this.clicked = clickedPawn
             this.moveValidator()
-          }
-          else if(Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 /*&& Game.playerTurn == false*/){
-            if(clickedPawn == this.clicked)
+          } else if (Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 /*&& Game.playerTurn == false*/ ) {
+            if (clickedPawn == this.clicked)
               return
-              console.log("gracz 2")
+            console.log("gracz 2")
             this.clicked = clickedPawn
             this.moveValidator()
           }
@@ -170,7 +224,14 @@ class Game {
     }
   }
 
-  moveValidator(){
+  add2Scene(obj) {
+    this.webgl.scene.add(obj.object3d);
+    this.webgl.scene.add(obj.pointLight);
+    if (obj.reflectObject != null)
+      this.add2Scene(obj.reflectObject);
+  }
+
+  moveValidator() {
     let x = (this.clicked.position.x + this.board.length * 10) / 20
     let y = (this.clicked.position.z + this.board.length * 10) / 20
     //console.log(x, y)

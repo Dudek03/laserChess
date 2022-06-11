@@ -1,8 +1,10 @@
 import {
   OrbitControls
 } from '../libs/OrbitControls.js'
+import LaserBeam from './Laser.js'
 class WebGl {
   static instance
+  static objectArray
   constructor() {
     WebGl.instance = this
     this.scene = new THREE.Scene();
