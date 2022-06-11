@@ -48,6 +48,29 @@ class Net {
         return data;
     }
 
+    playerMove(pos){
+        fetch("/playerMove", {method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(pos)})
+            ///.then(res => res.json())
+            //.then(res => console.log(res, "new tab"))
+            .catch(error => console.log(error))
+    }
+
+    getPawnsPosition() {
+        const res = fetch("/getPawns")
+            .then(res => res.json())
+            //.then(res => console.log(res))
+            .catch(error => console.log(error))
+        return res
+    }
+
+    getPawnsRotation() {
+        const res = fetch("/getRotation")
+            .then(res => res.json())
+            //.then(res => console.log(res))
+            .catch(error => console.log(error))
+        return res
+    }
+
 }
 
 export default Net

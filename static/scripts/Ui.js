@@ -14,6 +14,14 @@ class Ui {
         document.getElementById("boardChoice").style.display = "block"
     }
 
+    displayArrows(){
+        document.getElementById("arrows").style.display = "grid"
+    }
+
+    hideArrows(){
+        document.getElementById("arrows").style.display = "none"
+    }
+
     waitForSecondPlayerChoice(){
         document.getElementById("boardChoice").style.display = "none"
         document.getElementById("loginWindow").style.display = "block"

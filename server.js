@@ -50,6 +50,18 @@ app.get("/getTables", async (req, res) => {
     res.send(JSON.stringify(response))
 })
 
+app.post("/playerMove", function(req, res){
+    let response = userController.playerMove(req.body)
+    res.send()
+})
+
+app.get("/getPawns", function (req, res) {
+    res.send(JSON.stringify(data.pawns))
+})
+
+app.get("/getRotation", function (req, res) {
+    res.send(JSON.stringify(data.rotation))
+})
 
 //______________
 app.listen(PORT, function () {
