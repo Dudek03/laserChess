@@ -3,10 +3,12 @@ import WebGl from "./WebGl.js"
 import Ui from "./Ui.js"
 import Cube from "./Cube.js"
 import Pawn from "./Pawn.js"
+import LaserBeam from './Laser.js'
 class Game {
   static instance
   static playerTurn
   constructor() {
+    this.objectArray = []
     Game.instance = this
     Game.playerTurn = true
     this.net = new Net
@@ -73,6 +75,14 @@ class Game {
           this.checkPlayerTurn()
           this.createRaycaster()
           this.checkForChanges()
+          this.LaserBeam = new LaserBeam({
+            reflectMax: 10
+          });
+          this.add2Scene(this.LaserBeam);
+          this.LaserBeam2 = new LaserBeam({
+            reflectMax: 10
+          });
+          this.add2Scene(this.LaserBeam2);
         }
       }, 1000)
     })
@@ -102,7 +112,9 @@ class Game {
   }
 
   createPawns = async () => {
-
+    this.objectArray = [];
+    let count = 0;
+    let much = 0;
     for (let i = 0; i < this.pawns.length; i++) {
       for (let j = 0; j < this.pawns[i].length; j++) {
         let pawn = new Pawn
@@ -123,7 +135,17 @@ class Game {
         else if (this.pawns[i][j] == 6 || this.pawns[i][j] == 106)
           await pawn.init("sentry")
 
+        pawn.pawn.children.forEach((item, i) => {
+          count++;
+          if (item.type.trim() == "Mesh" && item.name != "shelder") {
+            this.objectArray.push(item);
+            console.log(item)
+            much++;
+          }
+        });
+
         if (this.pawns[i][j] == 1000 || (this.pawns[i][j] > 0 && this.pawns[i][j] < 100)) {
+
           pawn.pawn.children[1].material.color.setHex(0x0a0ab0)
           pawn.pawn.children[0].name += "-Blue"
         }
@@ -136,8 +158,28 @@ class Game {
         pawn.pawn.rotation.y = this.rotation[i][j] * Math.PI / 2 * -1
         this.pawnTable.push(pawn.pawn)
         this.webgl.scene.add(pawn.pawn)
+
       }
     }
+    //red
+    this.LaserBeam.object3d.position.set(-80, 30, -90)
+    this.LaserBeam.intersect(
+      new THREE.Vector3(0, 0, 40),
+      this.objectArray
+    );
+    //blue
+    this.LaserBeam2.object3d.position.set(100, 30, 60)
+    this.LaserBeam2.intersect(
+      new THREE.Vector3(0, 0, -40),
+      this.objectArray
+    );
+    // dziala
+    // this.LaserBeam2.intersect(
+    //   new THREE.Vector3(0.3, 0, -40),
+    //   this.objectArray
+    // );
+    // console.log(count)
+    // console.log(much)
   }
 
   raycast(e) {
@@ -153,7 +195,6 @@ class Game {
           if (clickedPawn.name != "Scene") return
           const CLICKEDCOLOR = clickedPawn.children[1].material.color
           const CLICKEDNAME = clickedPawn.children[0].name
-
           if (this.clicked && (this.clicked.children[0].name.split("-")[1] == "Red" && CLICKEDNAME.split("-")[1] == "Red" || this.clicked.children[0].name.split("-")[1] == "Blue" && CLICKEDNAME.split("-")[1] == "Blue")) {
             this.ui.hideArrows()
             if (this.clicked.children[0].name.split("-")[1] == "Red")
@@ -163,6 +204,7 @@ class Game {
               this.clicked.children[1].material.color.setHex(0x0a0ab0)
 
             let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
+
             greenCubes.forEach(e => { e.children[6].material.color.setHex(0x242424) })
             //this.clicked = null
           }
@@ -175,6 +217,7 @@ class Game {
               return
             this.clicked = clickedPawn
             this.moveValidator()
+
           }
           else if (Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 && Game.playerTurn == false) {
             if (clickedPawn == this.clicked || CLICKEDNAME == "cube")
@@ -187,6 +230,12 @@ class Game {
     }
   }
 
+  add2Scene(obj) {
+    this.webgl.scene.add(obj.object3d);
+    this.webgl.scene.add(obj.pointLight);
+    if (obj.reflectObject != null)
+      this.add2Scene(obj.reflectObject);
+  }
   moveValidator() {
     if (!this.clicked) return
     //console.log(this.clicked)
@@ -233,7 +282,6 @@ class Game {
     }
 
     cubesToCHange.forEach(e => { e.children[6].material.color.setHex(0x00ff00) })
-
   }
 
   move(pos) {
