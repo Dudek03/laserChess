@@ -50,6 +50,7 @@ class WebGl {
   render = () => {
     requestAnimationFrame(this.render)
     this.renderer.render(this.scene, this.camera)
+    window.addEventListener('resize', this.webgl.onWindowResize.bind(this), false)
     //console.log("render leci")
     TWEEN.update()
   }
@@ -59,11 +60,11 @@ class WebGl {
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(window.innerWidth, window.innerHeight)
   }
-  smoothyMove(clicked,pos){
+  smoothyMove(clicked, pos) {
     new TWEEN.Tween(clicked.position)
-          .to({ x: pos.x, y: 20, z: pos.z }, 200)
-          .easing(TWEEN.Easing.Quadratic.Out)
-          .start()
+      .to({ x: pos.x, y: 20, z: pos.z }, 200)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .start()
   }
 }
 

@@ -24,7 +24,6 @@ class Game {
     let playerChoice
     const possibleChoices = document.querySelectorAll(".choice")
 
-    window.addEventListener('resize', this.webgl.onWindowResize.bind(this), false)
     document.getElementById("logOn").addEventListener("click", () => {
       let name = document.getElementById("login").value
       this.net.addPlayer(name)
