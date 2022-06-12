@@ -2,7 +2,7 @@ var express = require("express")
 var app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
-const PORT = 4000;
+const PORT = 3000;
 app.use(express.static('static'))
 var path = require("path")
 const userController = require("./controllers/userController")
@@ -61,6 +61,10 @@ app.get("/getPawns", function (req, res) {
 
 app.get("/getRotation", function (req, res) {
     res.send(JSON.stringify(data.rotation))
+})
+
+app.get("/getTurn", function(req, res) {
+    res.send(JSON.stringify(data.turn))
 })
 
 //______________
