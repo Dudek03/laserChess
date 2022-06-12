@@ -48,6 +48,11 @@ class Net {
         return data;
     }
 
+    removePlayer() {
+        fetch("/removePlayers", { method: "POST" })
+            .catch(error => console.log(error))
+    }
+
     playerMove(pos){
         fetch("/playerMove", {method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(pos)})
             ///.then(res => res.json())

@@ -67,6 +67,11 @@ app.get("/getTurn", function(req, res) {
     res.send(JSON.stringify(data.turn))
 })
 
+app.post("/removePlayers", function (req, res){
+    userController.restartGame()
+    res.send()
+})
+
 //______________
 app.listen(PORT, function () {
     console.log("start serwera na porcie " + PORT)

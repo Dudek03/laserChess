@@ -50,7 +50,7 @@ class WebGl {
   render = () => {
     requestAnimationFrame(this.render)
     this.renderer.render(this.scene, this.camera)
-    window.addEventListener('resize', this.webgl.onWindowResize.bind(this), false)
+    window.addEventListener('resize', this.onWindowResize.bind(this), false)
     //console.log("render leci")
     TWEEN.update()
   }
