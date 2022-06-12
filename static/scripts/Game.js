@@ -176,7 +176,17 @@ class Game {
 
             let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
 
-            greenCubes.forEach(e => { e.children[6].material.color.setHex(0x242424) })
+            greenCubes.forEach(e => {
+              let x = (e.position.x + this.board.length * 10) / 20
+              let y = (e.position.z + this.board.length * 10) / 20
+              if (this.board[y][x] == -2) {
+                e.children[6].material.color.setHex(0xb00a0a)
+              } else if (this.board[y][x] == -1) {
+                e.children[6].material.color.setHex(0x0a0ab0)
+              } else if (this.board[y][x] == 1) {
+                e.children[6].material.color.setHex(0x242424)
+              }
+            })
             //this.clicked = null
           }
           if (this.clicked && CLICKEDNAME == 'cube' && clickedPawn.children[6].material.color.g == 1 && clickedPawn.children[6].material.color.r == 0 && clickedPawn.children[6].material.color.b == 0) {
@@ -279,7 +289,17 @@ class Game {
       this.clicked.children[1].material.color.setHex(0x0a0ab0)
 
     let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
-    greenCubes.forEach(e => { e.children[6].material.color.setHex(0x242424) })
+    greenCubes.forEach(e => {
+      let x = (e.position.x + this.board.length * 10) / 20
+      let y = (e.position.z + this.board.length * 10) / 20
+      if (this.board[y][x] == -2) {
+        e.children[6].material.color.setHex(0xb00a0a)
+      } else if (this.board[y][x] == -1) {
+        e.children[6].material.color.setHex(0x0a0ab0)
+      } else if (this.board[y][x] == 1) {
+        e.children[6].material.color.setHex(0x242424)
+      }
+    })
     console.log(this.clicked)
 
     console.log(pos, "move")
@@ -343,7 +363,7 @@ class Game {
         }
       }
     }
-    if (foundPawn && newX && newZ || newX == 0 || newZ == 0) {
+    if (foundPawn && newX >= 0 && newZ >= 0) {
       foundPawn.position.x = (newX - this.board.length / 2) * 20
       foundPawn.position.z = (newZ - this.board.length / 2) * 20
     }
