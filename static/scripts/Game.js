@@ -24,6 +24,7 @@ class Game {
     let playerChoice
     const possibleChoices = document.querySelectorAll(".choice")
 
+    window.addEventListener('resize', this.webgl.onWindowResize.bind(this), false)
     document.getElementById("logOn").addEventListener("click", () => {
       let name = document.getElementById("login").value
       this.net.addPlayer(name)
@@ -73,14 +74,7 @@ class Game {
           this.createChessBoard()
           this.createPawns()
           this.createRaycaster()
-          this.LaserBeam = new LaserBeam({
-            reflectMax: 10
-          });
-          this.add2Scene(this.LaserBeam);
-          this.LaserBeam2 = new LaserBeam({
-            reflectMax: 10
-          });
-          this.add2Scene(this.LaserBeam2);
+
         }
       }, 1000)
     })
@@ -134,11 +128,8 @@ class Game {
           await pawn.init("sentry")
 
         pawn.pawn.children.forEach((item, i) => {
-          count++;
           if (item.type.trim() == "Mesh" && item.name != "shelder") {
             this.objectArray.push(item);
-            console.log(item)
-            much++;
           }
         });
 
@@ -159,25 +150,6 @@ class Game {
 
       }
     }
-    //red
-    this.LaserBeam.object3d.position.set(-80, 30, -90)
-    this.LaserBeam.intersect(
-      new THREE.Vector3(0, 0, 40),
-      this.objectArray
-    );
-    //blue
-    this.LaserBeam2.object3d.position.set(100, 30, 60)
-    this.LaserBeam2.intersect(
-      new THREE.Vector3(0, 0, -40),
-      this.objectArray
-    );
-    // dziala
-    // this.LaserBeam2.intersect(
-    //   new THREE.Vector3(0.3, 0, -40),
-    //   this.objectArray
-    // );
-    // console.log(count)
-    // console.log(much)
   }
 
   raycast(e) {
@@ -236,6 +208,12 @@ class Game {
     if (obj.reflectObject != null)
       this.add2Scene(obj.reflectObject);
   }
+  removeFromScene(obj) {
+    this.webgl.scene.remove(obj.object3d);
+    this.webgl.scene.remove(obj.pointLight);
+    if (obj.reflectObject != null)
+      this.removeFromScene(obj.reflectObject);
+  }
   moveValidator() {
     if (!this.clicked) return
     console.log(this.clicked)
@@ -282,10 +260,13 @@ class Game {
     }
 
     cubesToCHange.forEach(e => { e.children[6].material.color.setHex(0x00ff00) })
-   
+
   }
 
-  move(pos) {
+  move = async (pos) => {
+    if(this.LaserBeam)
+      this.removeFromScene(this.LaserBeam)
+      let rot = this.clicked.children.find(mech => mech.name == "Cube008")
     let modelNum
     let positions = {
       color: this.clicked.children[0].name.split("-")[1],
@@ -301,6 +282,7 @@ class Game {
 
     let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
     greenCubes.forEach(e => { e.children[6].material.color.setHex(0x242424) })
+    console.log(this.clicked)
 
     console.log(pos, "move")
     if (typeof (pos) == "string") {
@@ -314,7 +296,8 @@ class Game {
       positions.rotation = rotation
       this.rotation[positions.oldZ][positions.oldX] += rotation
       this.clicked.rotation.y = this.rotation[positions.oldZ][positions.oldX] * Math.PI / 2 * -1
-      
+      // this.objectArray.
+      // objectArray.splice(index,1,newMesh)
     }
     else if (typeof (pos) == "object") {
       positions.newX = (pos.x + this.board.length * 10) / 20,
@@ -324,16 +307,19 @@ class Game {
       //       .to({ x: pos.x, y: 20, z: pos.z }, 200)
       //       .easing(TWEEN.Easing.Quadratic.Out)
       //       .start()
-      this.clicked.position.x = pos.x
-      this.clicked.position.z = pos.z
+      await this.webgl.smoothyMove(this.clicked,pos)
+      // this.clicked.position.x = await pos.x
+      // this.clicked.position.z = await pos.z
       modelNum = this.pawns[positions.oldZ][positions.oldX]
       this.pawns[positions.oldZ][positions.oldX] = 0
       this.pawns[positions.newZ][positions.newX] = modelNum
-      
     }
+
     this.clicked = null
-    this.laserShoot()
-    this.net.playerMove(positions)
+    setTimeout(()=>{
+      this.laserShoot()
+    },200)
+    await this.net.playerMove(positions)
   }
 
   checkForChanges = async () => {
@@ -342,10 +328,37 @@ class Game {
 
   }
 
-  laserShoot(){
-    console.log("pew pew")
+  laserShoot = () => {
+    this.LaserBeam = new LaserBeam({
+      reflectMax: 10
+    });
+    if(Ui.player.len == 1){
+      this.LaserBeam.object3d.position.set(100, 30, 60)
+      this.LaserBeam.intersect(
+        new THREE.Vector3(0, 0, -40),
+        this.objectArray
+      );
+    }else if(Ui.player.len == 2){
+      this.LaserBeam.object3d.position.set(-80, 30, -90)
+      this.LaserBeam.intersect(
+        new THREE.Vector3(0, 0, 40),
+        this.objectArray
+      );
+    }
+    this.add2Scene(this.LaserBeam);
   }
-
+  static win = (obj) => {
+    let textWin = "win "
+    if(obj.parent.children[0].name.includes("Blue"))
+      textWin += "czerwony"
+    if(obj.parent.children[0].name.includes("Red"))
+      textWin += "niebieski"
+    alert(textWin)
+  }
+  static destroy = (obj) => {
+    console.log("destry")
+    // console.log(obj.parent)
+  }
 }
 
 export default Game
