@@ -71,6 +71,14 @@ class Net {
         return res
     }
 
+    getPlayerTurn() {
+        const res = fetch("/getTurn")
+            .then(res => res.json())
+            //.then(res => console.log(res))
+            .catch(error => console.log(error))
+        return res
+    }
+
 }
 
 export default Net

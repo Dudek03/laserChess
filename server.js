@@ -63,6 +63,10 @@ app.get("/getRotation", function (req, res) {
     res.send(JSON.stringify(data.rotation))
 })
 
+app.get("/getTurn", function(req, res) {
+    res.send(JSON.stringify(data.turn))
+})
+
 //______________
 app.listen(PORT, function () {
     console.log("start serwera na porcie " + PORT)
