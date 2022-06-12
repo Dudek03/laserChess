@@ -396,7 +396,7 @@ class Game {
   static destroy = (obj) => {
     console.log("destry")
     // console.log(obj.parent)
-
+}
   checkPlayerTurn = async () => {
     let turn = await this.net.getPlayerTurn()
     if (Game.playerTurn != turn)
