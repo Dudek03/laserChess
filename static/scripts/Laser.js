@@ -1,7 +1,9 @@
+import Game from './Game.js'
+import Ui from './Ui.js'
 class LaserBeam {
   constructor(ifconfig) {
     this.config = {
-      length: 100,
+      length: 220,
       reflectMax: 1
     };
     this.ifconfig = ifconfig
@@ -26,7 +28,6 @@ class LaserBeam {
     let i, nPlanes = 10;
     for (i = 0; i < nPlanes; i++) {
       let mesh = new THREE.Mesh(this.geometry, this.material);
-      // mesh.position.y = 21;
       mesh.rotation.z = i / nPlanes * Math.PI;
       mesh.position.z = 1 / 2;
       this.object3d.add(mesh);
@@ -44,43 +45,41 @@ class LaserBeam {
       direction.clone().normalize()
     );
 
-    var intersectArray = [];
+    let intersectArray = [];
     intersectArray = this.raycaster.intersectObjects(objectArray, true);
 
-    //have collision
     if (intersectArray.length > 0) {
       this.object3d.scale.z = intersectArray[0].distance;
       this.object3d.lookAt(intersectArray[0].point.clone());
       this.pointLight.visible = true;
 
-      //get normal vector
-      var normalMatrix = new THREE.Matrix3().getNormalMatrix(intersectArray[0].object.matrixWorld);
-      var normalVector = intersectArray[0].face.normal.clone().applyMatrix3(normalMatrix).normalize();
+      let normalMatrix = new THREE.Matrix3().getNormalMatrix(intersectArray[0].object.matrixWorld);
+      let normalVector = intersectArray[0].face.normal.clone().applyMatrix3(normalMatrix).normalize();
       if(intersectArray[0].object.name.includes("block")){
         console.log("block")
         return;
       }
+      console.log(intersectArray[0].object.name)
       if(intersectArray[0].object.name.includes("king")){
-        console.log("win - king dead")
+        console.log("destroy king")
+        Game.win(intersectArray[0].object)
+        Game.destroy()
         return;
       }
       if(intersectArray[0].object.name.includes("vuln")){
-        console.log("destroy")
+        Game.destroy(intersectArray[0].object)
         return;
       }
-      //set pointLight under plane
       this.pointLight.position.x = intersectArray[0].point.x + normalVector.x * 0.5;
       this.pointLight.position.y = intersectArray[0].point.y + normalVector.y * 0.5;
       this.pointLight.position.z = intersectArray[0].point.z + normalVector.z * 0.5;
 
-      //calculation reflect vector
-      var reflectVector = new THREE.Vector3(
+      let reflectVector = new THREE.Vector3(
         intersectArray[0].point.x - this.object3d.position.x,
         intersectArray[0].point.y - this.object3d.position.y,
         intersectArray[0].point.z - this.object3d.position.z
       ).normalize().reflect(normalVector);
 
-      //set reflectObject
       if (this.reflectObject != null) {
         this.reflectObject.object3d.visible = true;
         this.reflectObject.object3d.position.set(
@@ -89,11 +88,9 @@ class LaserBeam {
           intersectArray[0].point.z
         );
 
-        //iteration reflect
         this.reflectObject.intersect(reflectVector.clone(), objectArray);
       }
     }
-    //non collision
     else {
       this.object3d.scale.z = this.config.length;
       this.pointLight.visible = false;
@@ -125,10 +122,8 @@ class LaserBeam {
     gradient.addColorStop(0.5, 'rgba(255,255,255,0.5)');
     gradient.addColorStop(0.9, 'rgba(160,160,160,0.3)');
     gradient.addColorStop(1.0, 'rgba(  0,  0,  0,0.1)');
-    // fill the rectangle
     context.fillStyle = gradient;
     context.fillRect(0, 0, canvas.width, canvas.height);
-    // return the just built canvas
     return canvas;
   }
   extend(a,b) {
