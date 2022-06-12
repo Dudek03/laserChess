@@ -34,7 +34,7 @@ class Game {
           this.ui.removeAlert()
           this.ui.displayBoardChoice()
         }
-      }, 1000)
+      }, 250)
     })
 
     document.getElementById("reset").addEventListener("click", () => {
@@ -343,7 +343,7 @@ class Game {
         }
       }
     }
-    if (newX && newZ || newX == 0 || newZ == 0) {
+    if (foundPawn && newX && newZ || newX == 0 || newZ == 0) {
       foundPawn.position.x = (newX - this.board.length / 2) * 20
       foundPawn.position.z = (newZ - this.board.length / 2) * 20
     }
@@ -364,7 +364,7 @@ class Game {
 
     this.pawns = serverPawns
     this.rotation = serverRotations
-    setTimeout(this.checkForChanges, 1000)
+    setTimeout(this.checkForChanges, 250)
   }
   laserShoot = () => {
     this.LaserBeam = new LaserBeam({
