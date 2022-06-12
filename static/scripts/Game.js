@@ -364,7 +364,7 @@ class Game {
 
     this.pawns = serverPawns
     this.rotation = serverRotations
-    setTimeout(this.checkForChanges, 1000)
+    setTimeout(this.checkForChanges, 150)
   }
   laserShoot = () => {
     this.LaserBeam = new LaserBeam({
