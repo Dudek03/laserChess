@@ -67,15 +67,19 @@ module.exports = {
     },
 
     playerMove: (pos) => {
-        console.log(pos)
+        //console.log(pos)
         if (pos.newX == "none" && pos.newZ == "none") {
             data.rotation[pos.oldZ][pos.oldX] += pos.rotation
         }
         else if (pos.rotation == "none") {
-            modelNum = data.pawns[pos.oldZ][pos.oldX]
+            let modelNum = data.pawns[pos.oldZ][pos.oldX]
             data.pawns[pos.oldZ][pos.oldX] = 0
-            data.pawns[pos.oldZ][pos.newX] = modelNum
+            data.pawns[pos.newZ][pos.newX] = modelNum
         }
+        if(pos.color == "Red" && data.turn == false)
+            data.turn = true
+        else if(pos.color == "Blue" && data.turn == true)
+            data.turn = false
     }
 
 }

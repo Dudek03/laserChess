@@ -73,8 +73,9 @@ class Game {
           this.rotation = dbTab.rotations
           this.createChessBoard()
           this.createPawns()
+          this.checkPlayerTurn()
           this.createRaycaster()
-
+          this.checkForChanges()
         }
       }, 1000)
     })
@@ -165,8 +166,6 @@ class Game {
           if (clickedPawn.name != "Scene") return
           const CLICKEDCOLOR = clickedPawn.children[1].material.color
           const CLICKEDNAME = clickedPawn.children[0].name
-
-
           if (this.clicked && (this.clicked.children[0].name.split("-")[1] == "Red" && CLICKEDNAME.split("-")[1] == "Red" || this.clicked.children[0].name.split("-")[1] == "Blue" && CLICKEDNAME.split("-")[1] == "Blue")) {
             this.ui.hideArrows()
             if (this.clicked.children[0].name.split("-")[1] == "Red")
@@ -184,14 +183,14 @@ class Game {
             this.move(clickedPawn.position)
           }
 
-          if (Ui.player.len == 1 && CLICKEDCOLOR.b > 0.69 /*&& Game.playerTurn == true*/) {
+          if (Ui.player.len == 1 && CLICKEDCOLOR.b > 0.69 && Game.playerTurn == true) {
             if (clickedPawn == this.clicked || CLICKEDNAME == "cube")
               return
             this.clicked = clickedPawn
             this.moveValidator()
 
           }
-          else if (Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 /*&& Game.playerTurn == false*/) {
+          else if (Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 && Game.playerTurn == false) {
             if (clickedPawn == this.clicked || CLICKEDNAME == "cube")
               return
             this.clicked = clickedPawn
@@ -216,7 +215,7 @@ class Game {
   }
   moveValidator() {
     if (!this.clicked) return
-    console.log(this.clicked)
+    //console.log(this.clicked)
     const THISCLICKEDNAME = this.clicked.children[0].name.split("-")
     let foundCube
     let cubesToCHange = []
@@ -260,7 +259,6 @@ class Game {
     }
 
     cubesToCHange.forEach(e => { e.children[6].material.color.setHex(0x00ff00) })
-
   }
 
   move = async (pos) => {
@@ -287,9 +285,9 @@ class Game {
     console.log(pos, "move")
     if (typeof (pos) == "string") {
       let rotation
-      if(pos == "left")
+      if (pos == "left")
         rotation = -1
-      else if(pos == "right")
+      else if (pos == "right")
         rotation = 1
       positions.newX = "none"
       positions.newZ = "none"
@@ -325,9 +323,49 @@ class Game {
   checkForChanges = async () => {
     let serverPawns = await this.net.getPawnsPosition()
     let serverRotations = await this.net.getPawnsRotation()
+    let newX
+    let newZ
+    let foundPawn
+    let rotation
 
+    //ruch
+    for (let i = 0; i < serverPawns.length; i++) {
+      for (let j = 0; j < serverPawns[i].length; j++) {
+        if (serverPawns[i][j] == this.pawns[i][j]) continue
+        else if (serverPawns[i][j] != this.pawns[i][j]) {
+          if (serverPawns[i][j] == 0 && this.pawns[i][j] != 0) {
+            foundPawn = this.pawnTable.find(e => e.position.x == (j - this.board.length / 2) * 20 && e.position.z == (i - this.board.length / 2) * 20)
+          }
+          if (serverPawns[i][j] != 0 && this.pawns[i][j] == 0) {
+            newX = j
+            newZ = i
+          }
+        }
+      }
+    }
+    if (newX && newZ || newX == 0 || newZ == 0) {
+      foundPawn.position.x = (newX - this.board.length / 2) * 20
+      foundPawn.position.z = (newZ - this.board.length / 2) * 20
+    }
+    // else
+    //   this.webgl.scene.remove(foundPawn)
+    ///rotacja
+    for (let i = 0; i < serverPawns.length; i++) {
+      for (let j = 0; j < serverPawns[i].length; j++) {
+        if (serverRotations[i][j] == this.rotation[i][j]) continue
+        else if (serverRotations[i][j] != this.rotation[i][j]) {
+          foundPawn = this.pawnTable.find(e => e.position.x == (j - this.board.length / 2) * 20 && e.position.z == (i - this.board.length / 2) * 20)
+          rotation = serverRotations[i][j]
+        }
+      }
+    }
+    if (foundPawn && rotation >= 0)
+      foundPawn.rotation.y = rotation * Math.PI / 2 * -1
+
+    this.pawns = serverPawns
+    this.rotation = serverRotations
+    setTimeout(this.checkForChanges, 1000)
   }
-
   laserShoot = () => {
     this.LaserBeam = new LaserBeam({
       reflectMax: 10
@@ -358,7 +396,15 @@ class Game {
   static destroy = (obj) => {
     console.log("destry")
     // console.log(obj.parent)
-  }
+
+  checkPlayerTurn = async () => {
+    let turn = await this.net.getPlayerTurn()
+    if (Game.playerTurn != turn)
+        Game.playerTurn = turn
+
+    setTimeout(this.checkPlayerTurn, 150)
+}
+
 }
 
 export default Game
