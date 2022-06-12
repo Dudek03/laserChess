@@ -37,7 +37,7 @@ class Game {
     })
 
     document.getElementById("reset").addEventListener("click", () => {
-      //this.net.removePlayer()
+      this.net.removePlayer()
       console.log("reset lol")
     })
 

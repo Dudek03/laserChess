@@ -80,6 +80,16 @@ module.exports = {
             data.turn = true
         else if(pos.color == "Blue" && data.turn == true)
             data.turn = false
+    },
+
+    restartGame: () => {
+        data.userTab = []
+        data.board = null
+        data.pawns = null
+        data.rotation = null
+        data.turn = true
+        data.chosenBoards = []
+        data.finalBboard = 0
     }
 
 }
