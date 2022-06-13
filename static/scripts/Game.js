@@ -423,7 +423,7 @@ class Game {
     alert(textWin)
   }
   destroy = async (obj) => {
-    this.pawnTable[0][0] = 0;
+    // this.pawnTable[(obj.position.z + this.board.length * 10) / 20][(obj.position.x + this.board.length * 10) / 20] = 0;
     console.log(obj)
     console.log("destry")
     this.net.removePawn(obj.parent.position)
