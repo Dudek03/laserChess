@@ -81,6 +81,10 @@ module.exports = {
         else if(pos.color == "Blue" && data.turn == true)
             data.turn = false
     },
+  
+    removePawn: (pos) => {
+      // data.pawns[(pos.z + data.board.length * 10) / 20][(pos.x + data.board.length * 10) / 20] = 0
+    },
 
     restartGame: () => {
         data.userTab = []
@@ -90,6 +94,6 @@ module.exports = {
         data.turn = true
         data.chosenBoards = []
         data.finalBboard = 0
-    }
 
+    }
 }

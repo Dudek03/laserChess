@@ -11,6 +11,9 @@ class Game {
   static instance
   static playerTurn
   constructor() {
+    this.rotationLaserX = 0;
+    this.rotationLaserY = 0;
+    this.rotationLaserZ = 40;
     this.objectArray = []
     Game.instance = this
     Game.playerTurn = true
@@ -123,8 +126,9 @@ class Game {
           await pawn.init("laser")
         else if (this.pawns[i][j] == 1 || this.pawns[i][j] == 101)
           await pawn.init("king")
-        else if (this.pawns[i][j] == 2 || this.pawns[i][j] == 102)
+        else if (this.pawns[i][j] == 2 || this.pawns[i][j] == 102){
           await pawn.init("shelder")
+        }
         else if (this.pawns[i][j] == 3 || this.pawns[i][j] == 103)
           await pawn.init("shield")
         else if (this.pawns[i][j] == 4 || this.pawns[i][j] == 104)
@@ -307,14 +311,26 @@ class Game {
       }
     })
     console.log(this.clicked)
-
     console.log(pos, "move")
+
+    let laserRotation = 0;
     if (typeof (pos) == "string") {
       let rotation
-      if (pos == "left")
+      if (pos == "left"){
         rotation = -1
-      else if (pos == "right")
+      }else if (pos == "right"){
         rotation = 1
+      }
+
+      if(this.clicked.children[0].name.split("-")[0] == "laser"){
+          if(this.rotation[positions.oldZ][positions.oldX]  % 2 == 0){
+            this.rotationLaserX = 40;
+            this.rotationLaserZ = 0;
+          }else{
+            this.rotationLaserX = 0;
+            this.rotationLaserZ = 40;
+          }
+      }
       positions.newX = "none"
       positions.newZ = "none"
       positions.rotation = rotation
@@ -341,8 +357,8 @@ class Game {
 
     this.clicked = null
     setTimeout(()=>{
-      this.laserShoot()
-    },200)
+      this.laserShoot(Ui.player.len)
+    },300)
     await this.net.playerMove(positions)
   }
 
@@ -353,14 +369,16 @@ class Game {
     let newZ
     let foundPawn
     let rotation
-
+    let remove
     //ruch
     for (let i = 0; i < serverPawns.length; i++) {
       for (let j = 0; j < serverPawns[i].length; j++) {
         if (serverPawns[i][j] == this.pawns[i][j]) continue
         else if (serverPawns[i][j] != this.pawns[i][j]) {
           if (serverPawns[i][j] == 0 && this.pawns[i][j] != 0) {
+            console.log("usunieto?")
             foundPawn = this.pawnTable.find(e => e.position.x == (j - this.board.length / 2) * 20 && e.position.z == (i - this.board.length / 2) * 20)
+            // console.log(this.pawnTable)
           }
           if (serverPawns[i][j] != 0 && this.pawns[i][j] == 0) {
             newX = j
@@ -369,12 +387,10 @@ class Game {
         }
       }
     }
+
     if (foundPawn && newX >= 0 && newZ >= 0) {
-      foundPawn.position.x = (newX - this.board.length / 2) * 20
-      foundPawn.position.z = (newZ - this.board.length / 2) * 20
+       this.webgl.smoothyMove(foundPawn,{x: (newX - this.board.length / 2) * 20, y: 20, z: (newZ - this.board.length / 2) * 20});
     }
-    // else
-    //   this.webgl.scene.remove(foundPawn)
     ///rotacja
     for (let i = 0; i < serverPawns.length; i++) {
       for (let j = 0; j < serverPawns[i].length; j++) {
@@ -382,34 +398,49 @@ class Game {
         else if (serverRotations[i][j] != this.rotation[i][j]) {
           foundPawn = this.pawnTable.find(e => e.position.x == (j - this.board.length / 2) * 20 && e.position.z == (i - this.board.length / 2) * 20)
           rotation = serverRotations[i][j]
+
         }
       }
     }
     if (foundPawn && rotation >= 0)
       foundPawn.rotation.y = rotation * Math.PI / 2 * -1
-
     this.pawns = serverPawns
     this.rotation = serverRotations
+
+    if(foundPawn){
+      let oposite = 1
+      if(Ui.player.len == 1)
+      oposite = 2
+
+      setTimeout(()=>{
+        this.laserShoot(oposite)
+      },300)
+    }
     setTimeout(this.checkForChanges, 250)
   }
-  laserShoot = () => {
+  laserShoot = (player) => {
+    setTimeout(()=>{
+      if(this.LaserBeam)
+        this.removeFromScene(this.LaserBeam)
+    },1000)
     this.LaserBeam = new LaserBeam({
       reflectMax: 10
     });
-    if(Ui.player.len == 1){
-      this.LaserBeam.object3d.position.set(100, 30, 60)
+    if(player == 1){
+      this.LaserBeam.object3d.position.set(98, 30, 56.45555) //blue
       this.LaserBeam.intersect(
-        new THREE.Vector3(0, 0, -40),
+        new THREE.Vector3(-this.rotationLaserX, this.rotationLaserY, -this.rotationLaserZ),
         this.objectArray
       );
-    }else if(Ui.player.len == 2){
-      this.LaserBeam.object3d.position.set(-80, 30, -90)
+    }else if(player == 2){
+      this.LaserBeam.object3d.position.set(-79, 30, -82.35555)//red
       this.LaserBeam.intersect(
-        new THREE.Vector3(0, 0, 40),
+        new THREE.Vector3(this.rotationLaserX, this.rotationLaserY, this.rotationLaserZ),
         this.objectArray
       );
     }
     this.add2Scene(this.LaserBeam);
+
   }
   static win = (obj) => {
     let textWin = "win "
@@ -419,18 +450,40 @@ class Game {
       textWin += "niebieski"
     alert(textWin)
   }
-  static destroy = (obj) => {
+  destroy = async (obj) => {
+    // this.pawnTable[(obj.position.z + this.board.length * 10) / 20][(obj.position.x + this.board.length * 10) / 20] = 0;
+    console.log(obj)
     console.log("destry")
+    this.net.removePawn(obj.parent.position)
+    for (let i = 0; i < obj.parent.children.length; i++) {
+        let randX = Math.floor(Math.random() * (100 + 1)) - 50;
+        let randY = Math.floor(Math.random() * (100 + 1)) - 50;
+        let randZ = Math.floor(Math.random() * (100 + 1)) - 50;
+        await WebGl.ssmoothyMove(obj.parent.children[i], {x: randX, y: randY, z: randZ});
+    }
+    setTimeout(()=>{
+      this.removeFromScene(this.LaserBeam)
+      this.LaserBeam = undefined;
+    },100)
+    setTimeout(()=>{
+      // obj.parent.remove(obj.parent.children[i])
+      obj.parent.parent.remove(obj.parent)
+    },2000)
     // console.log(obj.parent)
-}
+  }
   checkPlayerTurn = async () => {
     let turn = await this.net.getPlayerTurn()
     if (Game.playerTurn != turn)
         Game.playerTurn = turn
 
     setTimeout(this.checkPlayerTurn, 150)
-}
-
+  }
+  static clearLaser(){
+    setTimeout(()=>{
+      if(this.LaserBeam)
+        this.removeFromScene(this.LaserBeam)
+    },100)
+  }
 }
 
 export default Game
