@@ -4,6 +4,9 @@ import Ui from "./Ui.js"
 import Cube from "./Cube.js"
 import Pawn from "./Pawn.js"
 import LaserBeam from './Laser.js'
+import {
+  GLTFLoader
+} from '../libs/GLTFLoader.js'
 class Game {
   static instance
   static playerTurn
@@ -87,10 +90,14 @@ class Game {
   }
 
   createChessBoard = async () => {
+    let loader = new GLTFLoader();
+    let cub3 = new Cube
+    cub3.cube = await cub3.loadModel(loader);
     for (let i = 0; i < this.board.length; i++) {
       for (let j = 0; j < this.board[i].length; j++) {
         let cube = new Cube
-        await cube.init()
+        cube.cube = cub3.cube.clone();
+        cube.cube.children[6].material = cub3.cube.children[6].material.clone()
         if (this.board[i][j] == -2) {
           cube.cube.children[6].material.color.setHex(0xb00a0a)
         } else if (this.board[i][j] == -1) {
