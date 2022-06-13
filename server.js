@@ -55,6 +55,11 @@ app.post("/playerMove", function(req, res){
     res.send()
 })
 
+app.post("/removePawn", function(req, res){
+    let response = userController.removePawn(req.body)
+    res.send()
+})
+
 app.get("/getPawns", function (req, res) {
     res.send(JSON.stringify(data.pawns))
 })

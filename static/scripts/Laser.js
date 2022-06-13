@@ -111,6 +111,7 @@ class LaserBeam {
       this.reflectObject.pointLight.visible = false;
       this.reflectObject.hiddenReflectObject();
     }
+
   }
   generateLaserBodyCanvas() {
     let canvas = document.createElement('canvas');

@@ -80,6 +80,9 @@ module.exports = {
             data.turn = true
         else if(pos.color == "Blue" && data.turn == true)
             data.turn = false
+    },
+    removePawn: (pos) => {
+      console.log(pos)
+      // data.pawns[pos.z][pos.x] = 0
     }
-
 }
