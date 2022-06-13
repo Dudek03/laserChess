@@ -47,7 +47,7 @@ class LaserBeam {
 
     let intersectArray = [];
     intersectArray = this.raycaster.intersectObjects(objectArray, true);
-
+    console.log(intersectArray)
     if (intersectArray.length > 0) {
       this.object3d.scale.z = intersectArray[0].distance;
       this.object3d.lookAt(intersectArray[0].point.clone());
@@ -55,6 +55,8 @@ class LaserBeam {
 
       let normalMatrix = new THREE.Matrix3().getNormalMatrix(intersectArray[0].object.matrixWorld);
       let normalVector = intersectArray[0].face.normal.clone().applyMatrix3(normalMatrix).normalize();
+      normalVector.y = 0;
+      normalVector = normalVector.normalize();
       if(intersectArray[0].object.name.includes("block")){
         console.log("block")
         return;
@@ -63,11 +65,11 @@ class LaserBeam {
       if(intersectArray[0].object.name.includes("king")){
         console.log("destroy king")
         Game.win(intersectArray[0].object)
-        Game.destroy()
+        Game.instance.destroy()
         return;
       }
       if(intersectArray[0].object.name.includes("vuln")){
-        Game.destroy(intersectArray[0].object)
+        Game.instance.destroy(intersectArray[0].object)
         return;
       }
       this.pointLight.position.x = intersectArray[0].point.x + normalVector.x * 0.5;

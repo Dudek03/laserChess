@@ -8,6 +8,9 @@ class Game {
   static instance
   static playerTurn
   constructor() {
+    this.rotationLaserX = 0;
+    this.rotationLaserY = 0;
+    this.rotationLaserZ = 40;
     this.objectArray = []
     Game.instance = this
     Game.playerTurn = true
@@ -24,7 +27,6 @@ class Game {
     let playerChoice
     const possibleChoices = document.querySelectorAll(".choice")
 
-    window.addEventListener('resize', this.webgl.onWindowResize.bind(this), false)
     document.getElementById("logOn").addEventListener("click", () => {
       let name = document.getElementById("login").value
       this.net.addPlayer(name)
@@ -34,7 +36,7 @@ class Game {
           this.ui.removeAlert()
           this.ui.displayBoardChoice()
         }
-      }, 1000)
+      }, 250)
     })
 
     document.getElementById("reset").addEventListener("click", () => {
@@ -117,8 +119,9 @@ class Game {
           await pawn.init("laser")
         else if (this.pawns[i][j] == 1 || this.pawns[i][j] == 101)
           await pawn.init("king")
-        else if (this.pawns[i][j] == 2 || this.pawns[i][j] == 102)
+        else if (this.pawns[i][j] == 2 || this.pawns[i][j] == 102){
           await pawn.init("shelder")
+        }
         else if (this.pawns[i][j] == 3 || this.pawns[i][j] == 103)
           await pawn.init("shield")
         else if (this.pawns[i][j] == 4 || this.pawns[i][j] == 104)
@@ -281,14 +284,26 @@ class Game {
     let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
     greenCubes.forEach(e => { e.children[6].material.color.setHex(0x242424) })
     console.log(this.clicked)
-
     console.log(pos, "move")
+
+    let laserRotation = 0;
     if (typeof (pos) == "string") {
       let rotation
-      if (pos == "left")
+      if (pos == "left"){
         rotation = -1
-      else if (pos == "right")
+      }else if (pos == "right"){
         rotation = 1
+      }
+
+      if(this.clicked.children[0].name.split("-")[0] == "laser"){
+          if(this.rotation[positions.oldZ][positions.oldX]  % 2 == 0){
+            this.rotationLaserX = 40;
+            this.rotationLaserZ = 0;
+          }else{
+            this.rotationLaserX = 0;
+            this.rotationLaserZ = 40;
+          }
+      }
       positions.newX = "none"
       positions.newZ = "none"
       positions.rotation = rotation
@@ -315,8 +330,8 @@ class Game {
 
     this.clicked = null
     setTimeout(()=>{
-      this.laserShoot()
-    },200)
+      this.laserShoot(laserRotation)
+    },300)
     await this.net.playerMove(positions)
   }
 
@@ -343,9 +358,8 @@ class Game {
         }
       }
     }
-    if (newX && newZ || newX == 0 || newZ == 0) {
-      foundPawn.position.x = (newX - this.board.length / 2) * 20
-      foundPawn.position.z = (newZ - this.board.length / 2) * 20
+    if (foundPawn && newX && newZ || newX == 0 || newZ == 0) {
+      this.webgl.smoothyMove(foundPawn,{x: (newX - this.board.length / 2) * 20, y: 20, z: (newZ - this.board.length / 2) * 20});
     }
     // else
     //   this.webgl.scene.remove(foundPawn)
@@ -364,22 +378,22 @@ class Game {
 
     this.pawns = serverPawns
     this.rotation = serverRotations
-    setTimeout(this.checkForChanges, 1000)
+    setTimeout(this.checkForChanges, 250)
   }
-  laserShoot = () => {
+  laserShoot = (laserRotation) => {
     this.LaserBeam = new LaserBeam({
       reflectMax: 10
     });
     if(Ui.player.len == 1){
-      this.LaserBeam.object3d.position.set(100, 30, 60)
+      this.LaserBeam.object3d.position.set(98, 30, 56.45555) //blue
       this.LaserBeam.intersect(
-        new THREE.Vector3(0, 0, -40),
+        new THREE.Vector3(-this.rotationLaserX, this.rotationLaserY, -this.rotationLaserZ),
         this.objectArray
       );
     }else if(Ui.player.len == 2){
-      this.LaserBeam.object3d.position.set(-80, 30, -90)
+      this.LaserBeam.object3d.position.set(-79, 30, -82.35555)//red
       this.LaserBeam.intersect(
-        new THREE.Vector3(0, 0, 40),
+        new THREE.Vector3(this.rotationLaserX, this.rotationLaserY, this.rotationLaserZ),
         this.objectArray
       );
     }
@@ -393,9 +407,25 @@ class Game {
       textWin += "niebieski"
     alert(textWin)
   }
-  static destroy = (obj) => {
+  destroy = async (obj) => {
+    console.log(obj)
     console.log("destry")
+    for (let i = 0; i < obj.parent.children.length; i++) {
+        let randX = Math.floor(Math.random() * (100 + 1)) - 50;
+        let randY = Math.floor(Math.random() * (100 + 1)) - 50;
+        let randZ = Math.floor(Math.random() * (100 + 1)) - 50;
+        console.log(obj.parent)
+        await WebGl.ssmoothyMove(obj.parent.children[i], {x: randX, y: randY, z: randZ});
+    }
+    setTimeout(()=>{
+      this.removeFromScene(this.LaserBeam)
+    },100)
+    setTimeout(()=>{
+      // obj.parent.remove(obj.parent.children[i])
+      obj.parent.parent.remove(obj.parent)
+    },2000)
     // console.log(obj.parent)
+
 }
   checkPlayerTurn = async () => {
     let turn = await this.net.getPlayerTurn()
