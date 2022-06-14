@@ -21,6 +21,7 @@
     "@tweenjs/tween.js": "^18.6.4",
     "express": "^4.18.1",
     "nedb": "^1.8.0",
-    "nodb": "0.0.1"
+    "nodb": "0.0.1",
+    "socket.io": "^4.5.1"
   }
 }

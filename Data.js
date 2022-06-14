@@ -1,19 +1,15 @@
 class Data{
 
-    static userTab = []
-
-    static board
-
-    static pawns
-
-    static rotation
-
-    static turn = true
-
-    static chosenBoards = []
-
-    static finalBboard = 0
-
+    constructor(gameId, userId){
+        this.gameId = gameId
+        this.userTab = [userId]
+        this.chosenBoards = []
+        this.turn = true
+        this.pawns
+        this.finalBoard
+        this.board
+        this.rotation
+    }
 }
 
 module.exports = Data
