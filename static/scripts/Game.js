@@ -462,7 +462,7 @@ class Game {
     });
     console.log(obj)
     console.log("destry")
-    this.net.removePawn(obj.parent.position)
+
     for (let i = 0; i < obj.parent.children.length; i++) {
       let randX = Math.floor(Math.random() * (100 + 1)) - 50;
       let randY = Math.floor(Math.random() * (100 + 1)) - 50;

@@ -90,6 +90,7 @@ class Net {
           .catch(error => console.log(error))
       return res
     }
+
 }
 
 export default Net
