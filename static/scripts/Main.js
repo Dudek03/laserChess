@@ -4,7 +4,7 @@ let game;
 let ui;
 window.onload = () => {
 
-   const URL = "http://localhost:3000";
+   const URL = "/";
    const socket = io(URL);
    socket.on("xdd", (reson) => {
       console.log(reson)
