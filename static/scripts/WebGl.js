@@ -1,6 +1,6 @@
 import {
   OrbitControls
-  } from '../libs/OrbitControls.js'
+} from '../libs/OrbitControls.js'
 import LaserBeam from './Laser.js'
 class WebGl {
   static instance
@@ -52,7 +52,7 @@ class WebGl {
     this.renderer.render(this.scene, this.camera)
     window.addEventListener('resize', this.onWindowResize.bind(this), false)
     //console.log("render leci")
-        window.addEventListener('resize', this.onWindowResize.bind(this), false)
+    window.addEventListener('resize', this.onWindowResize.bind(this), false)
     TWEEN.update()
   }
 
@@ -62,17 +62,28 @@ class WebGl {
     this.renderer.setSize(window.innerWidth, window.innerHeight)
   }
   smoothyMove(clicked, pos) {
+    return new Promise((resolve, reject) => {
+      new TWEEN.Tween(clicked.position)
+        .to({
+          x: pos.x,
+          y: 20,
+          z: pos.z
+        }, 200)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onComplete(() => resolve())
+        .start()
+    })
+  }
+  static ssmoothyMove(clicked, pos) {
+
     new TWEEN.Tween(clicked.position)
-      .to({ x: pos.x, y: 20, z: pos.z }, 200)
+      .to({
+        x: pos.x,
+        y: pos.y,
+        z: pos.z
+      }, 2000)
       .easing(TWEEN.Easing.Quadratic.Out)
       .start()
-  }
-  static ssmoothyMove(clicked,pos){
-    new TWEEN.Tween(clicked.position)
-          .to({ x: pos.x, y: pos.y, z: pos.z }, 2000)
-          .easing(TWEEN.Easing.Quadratic.Out)
-          .start()
-
   }
 }
 

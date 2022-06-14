@@ -84,12 +84,13 @@ class Net {
         return res
     }
     removePawn(pos){
-        const res = fetch("/removePawn", {method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(pos)})
-            // .then(res => res.json())
-            //.then(res => console.log(res))
-            .catch(error => console.log(error))
-        return res
-      }
+      const res = fetch("/removePawn", {method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(pos)})
+          // .then(res => res.json())
+          //.then(res => console.log(res))
+          .catch(error => console.log(error))
+      return res
+    }
+
 }
 
 export default Net
