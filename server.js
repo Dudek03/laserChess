@@ -2,7 +2,7 @@ var express = require("express")
 var app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
-const PORT = 3000;
+const PORT = process.env.PORT || 3000
 app.use(express.static('static'))
 var path = require("path")
 const { createServer } = require("http");
@@ -43,6 +43,7 @@ io.on("connection", (socket) => {
         userController.playerMove(move, data)
         console.log(data.turn)
         socket.to(data.gameId).emit("move", data)
+        io.to(data.gameId).emit("turnChange", data)
         console.log(data.turn)
     })
     socket.on("removePawn", async (pawn) => {

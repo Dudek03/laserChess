@@ -81,10 +81,12 @@ class Game {
     this.createPawns()
     this.createRaycaster()
     this.socket.on("move", (move) => {
-      console.log(move)
+      console.log(move.turn)
       this.checkForChanges(move)
-      if (Game.playerTurn != move.turn)
-        Game.playerTurn = move.turn
+    })
+    this.socket.on("turnChange", (move) => {
+      console.log(move.turn)
+      Game.playerTurn = move.turn
     })
   }
 
@@ -204,7 +206,7 @@ class Game {
           if (this.clicked && CLICKEDNAME == 'cube' && clickedPawn.children[6].material.color.g == 1 && clickedPawn.children[6].material.color.r == 0 && clickedPawn.children[6].material.color.b == 0) {
             this.move(clickedPawn.position)
           }
-
+          console.log(Ui.player.len, "UI", Game.playerTurn, "tura")
           if (Ui.player.len == 1 && CLICKEDCOLOR.b > 0.69 && Game.playerTurn == true) {
             if (clickedPawn == this.clicked || CLICKEDNAME == "cube")
               return
