@@ -41,12 +41,12 @@ module.exports = {
         let firstPlayerChoice = data.chosenBoards[0].choice
         let secondPlayerChoice = data.chosenBoards[1].choice
         if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice == 'random' && data.finalBboard == 0)
-            res = Math.floor(Math.random() * 6) + 1
+            res = Math.floor(Math.random() * 5) + 1
 
         else if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice != 'random')
             res = data.chosenBoards[0].choice
 
-        else if (firstPlayerChoice != secondPlayerChoice && firstPlayerChoice != 'random' && secondPlayerChoice != 'random') {
+        else if (firstPlayerChoice != secondPlayerChoice && firstPlayerChoice != 'random' && secondPlayerChoice != 'random' && data.finalBboard == 0) {
             let temp = Math.floor(Math.random() * 2)
             res = data.chosenBoards[temp].choice
         }
