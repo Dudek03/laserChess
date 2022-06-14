@@ -368,7 +368,7 @@ class Game {
     let newX
     let newZ
     let foundPawn
-    let rotation
+    let rotation = null
     let remove
     //ruch
     for (let i = 0; i < serverPawns.length; i++) {
@@ -402,7 +402,7 @@ class Game {
         }
       }
     }
-    if (foundPawn && rotation >= 0)
+    if (foundPawn && rotation)
       foundPawn.rotation.y = rotation * Math.PI / 2 * -1
     this.pawns = serverPawns
     this.rotation = serverRotations
