@@ -5,7 +5,7 @@ module.exports = {
         let firstPlayerChoice = data.chosenBoards[0]
         let secondPlayerChoice = data.chosenBoards[1]
         if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice == 'random')
-            res = Math.floor(Math.random() * 6) + 1
+            res = Math.floor(Math.random() * 5) + 1
 
         else if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice != 'random')
             res = data.chosenBoards[0]
