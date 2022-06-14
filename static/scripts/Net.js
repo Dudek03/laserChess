@@ -10,7 +10,7 @@ class Net {
             console.log("X kurwa D")
             this.ui.removeAlert()
             this.ui.displayBoardChoice()
-          }) 
+          })
         this.socket.on("player", (data) => {
             this.ui.changeUIOnLog({len: data, user: name})
         })
@@ -27,12 +27,6 @@ class Net {
             .catch(error => console.log(error))
     }
 
-    playerMove(pos){
-        fetch("/playerMove", {method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(pos)})
-            ///.then(res => res.json())
-            //.then(res => console.log(res, "new tab"))
-            .catch(error => console.log(error))
-    }
 
     getPlayerTurn() {
         const res = fetch("/getTurn")
