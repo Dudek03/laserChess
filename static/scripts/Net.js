@@ -42,7 +42,6 @@ class Net {
         return res
     }
     removePawn(pos){
-      console.log("net",pos)
       const res = fetch("/removePawn", {method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(pos)})
           // .then(res => res.json())
           //.then(res => console.log(res))

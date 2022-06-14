@@ -130,9 +130,8 @@ class Game {
           await pawn.init("laser")
         else if (this.pawns[i][j] == 1 || this.pawns[i][j] == 101)
           await pawn.init("king")
-        else if (this.pawns[i][j] == 2 || this.pawns[i][j] == 102){
+        else if (this.pawns[i][j] == 2 || this.pawns[i][j] == 102)
           await pawn.init("shelder")
-        }
         else if (this.pawns[i][j] == 3 || this.pawns[i][j] == 103)
           await pawn.init("shield")
         else if (this.pawns[i][j] == 4 || this.pawns[i][j] == 104)
@@ -141,12 +140,13 @@ class Game {
           await pawn.init("mirror")
         else if (this.pawns[i][j] == 6 || this.pawns[i][j] == 106)
           await pawn.init("sentry")
-
-        pawn.pawn.children.forEach((item, i) => {
-          if (item.type.trim() == "Mesh" && item.name != "shelder") {
-            this.objectArray.push(item);
-          }
-        });
+        if (pawn.pawn.name != "laser") {
+          pawn.pawn.children.forEach((item, i) => {
+            if (item.type.trim() == "Mesh" && item.name != "shelder") {
+              this.objectArray.push(item);
+            }
+          });
+        }
 
         if (this.pawns[i][j] == 1000 || (this.pawns[i][j] > 0 && this.pawns[i][j] < 100)) {
 
@@ -213,8 +213,7 @@ class Game {
             this.clicked = clickedPawn
             this.moveValidator()
 
-          }
-          else if (Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 && Game.playerTurn == false) {
+          } else if (Ui.player.len == 2 && CLICKEDCOLOR.r > 0.69 && Game.playerTurn == false) {
             if (clickedPawn == this.clicked || CLICKEDNAME == "cube")
               return
             this.clicked = clickedPawn
@@ -240,6 +239,7 @@ class Game {
   moveValidator() {
     if (!this.clicked) return
     //console.log(this.clicked)
+    console.table(this.pawns)
     const THISCLICKEDNAME = this.clicked.children[0].name.split("-")
     let foundCube
     let cubesToCHange = []
@@ -282,13 +282,15 @@ class Game {
       }
     }
 
-    cubesToCHange.forEach(e => { e.children[6].material.color.setHex(0x00ff00) })
+    cubesToCHange.forEach(e => {
+      e.children[6].material.color.setHex(0x00ff00)
+    })
   }
 
   move = async (pos) => {
-    if(this.LaserBeam)
+    if (this.LaserBeam)
       this.removeFromScene(this.LaserBeam)
-      let rot = this.clicked.children.find(mech => mech.name == "Cube008")
+    let rot = this.clicked.children.find(mech => mech.name == "Cube008")
     let modelNum
     let positions = {
       color: this.clicked.children[0].name.split("-")[1],
@@ -318,22 +320,22 @@ class Game {
     console.log(pos, "move")
 
     let laserRotation = 0;
-    if (typeof (pos) == "string") {
+    if (typeof(pos) == "string") {
       let rotation
-      if (pos == "left"){
+      if (pos == "left") {
         rotation = -1
-      }else if (pos == "right"){
+      } else if (pos == "right") {
         rotation = 1
       }
 
-      if(this.clicked.children[0].name.split("-")[0] == "laser"){
-          if(this.rotation[positions.oldZ][positions.oldX]  % 2 == 0){
-            this.rotationLaserX = 40;
-            this.rotationLaserZ = 0;
-          }else{
-            this.rotationLaserX = 0;
-            this.rotationLaserZ = 40;
-          }
+      if (this.clicked.children[0].name.split("-")[0] == "laser") {
+        if (this.rotation[positions.oldZ][positions.oldX] % 2 == 0) {
+          this.rotationLaserX = 40;
+          this.rotationLaserZ = 0;
+        } else {
+          this.rotationLaserX = 0;
+          this.rotationLaserZ = 40;
+        }
       }
       positions.newX = "none"
       positions.newZ = "none"
@@ -342,8 +344,7 @@ class Game {
       this.clicked.rotation.y = this.rotation[positions.oldZ][positions.oldX] * Math.PI / 2 * -1
       // this.objectArray.
       // objectArray.splice(index,1,newMesh)
-    }
-    else if (typeof (pos) == "object") {
+    } else if (typeof(pos) == "object") {
       positions.newX = (pos.x + this.board.length * 10) / 20,
         positions.newZ = (pos.z + this.board.length * 10) / 20,
         positions.rotation = "none"
@@ -353,14 +354,18 @@ class Game {
       //       .start()
       // this.clicked.position.x = await pos.x
       // this.clicked.position.z = await pos.z
+
       modelNum = this.pawns[positions.oldZ][positions.oldX]
       this.pawns[positions.oldZ][positions.oldX] = 0
       this.pawns[positions.newZ][positions.newX] = modelNum
     }
+    await this.net.playerMove(positions)
+    await this.webgl.smoothyMove(this.clicked, pos)
 
     await this.webgl.smoothyMove(this.clicked,pos)
 
     this.clicked = null
+
 
     setTimeout(()=>{
       this.laserShoot(Ui.player.len)
@@ -396,7 +401,12 @@ class Game {
     }
 
     if (foundPawn && newX >= 0 && newZ >= 0) {
-       await this.webgl.smoothyMove(foundPawn,{x: (newX - this.board.length / 2) * 20, y: 20, z: (newZ - this.board.length / 2) * 20});
+      if (foundPawn.position.x != (newX - this.board.length / 2) * 20 || foundPawn.position.z != (newZ - this.board.length / 2) * 20)
+        await this.webgl.smoothyMove(foundPawn, {
+          x: (newX - this.board.length / 2) * 20,
+          y: 20,
+          z: (newZ - this.board.length / 2) * 20
+        });
     }
     ///rotacja
     for (let i = 0; i < serverRotations.length; i++) {
@@ -414,32 +424,32 @@ class Game {
     this.pawns = serverPawns
     this.rotation = serverRotations
 
-    if(foundPawn){
+    if (foundPawn) {
       let oposite = 1
-      if(Ui.player.len == 1)
-      oposite = 2
+      if (Ui.player.len == 1)
+        oposite = 2
 
-      setTimeout(()=>{
+      setTimeout(() => {
         this.laserShoot(oposite)
-      },300)
+      }, 300)
     }
   }
   laserShoot = (player) => {
-    setTimeout(()=>{
-      if(this.LaserBeam)
+    setTimeout(() => {
+      if (this.LaserBeam)
         this.removeFromScene(this.LaserBeam)
-    },1000)
+    }, 1000)
     this.LaserBeam = new LaserBeam({
       reflectMax: 10
     });
-    if(player == 1){
+    if (player == 1) {
       this.LaserBeam.object3d.position.set(98, 30, 56.45555) //blue
       this.LaserBeam.intersect(
         new THREE.Vector3(-this.rotationLaserX, this.rotationLaserY, -this.rotationLaserZ),
         this.objectArray
       );
-    }else if(player == 2){
-      this.LaserBeam.object3d.position.set(-79, 30, -82.35555)//red
+    } else if (player == 2) {
+      this.LaserBeam.object3d.position.set(-79, 30, -82.35555) //red
       this.LaserBeam.intersect(
         new THREE.Vector3(this.rotationLaserX, this.rotationLaserY, this.rotationLaserZ),
         this.objectArray
@@ -450,14 +460,15 @@ class Game {
   }
   static win = (obj) => {
     let textWin = "win "
-    if(obj.parent.children[0].name.includes("Blue"))
+    if (obj.parent.children[0].name.includes("Blue"))
       textWin += "czerwony"
-    if(obj.parent.children[0].name.includes("Red"))
+    if (obj.parent.children[0].name.includes("Red"))
       textWin += "niebieski"
     alert(textWin)
   }
   destroy = async (obj) => {
     this.pawns[(obj.parent.position.z + this.board.length * 10) / 20][(obj.parent.position.x + this.board.length * 10) / 20] = 0;
+
 
     console.log(obj)
     console.log("destry")
@@ -470,11 +481,11 @@ class Game {
       // obj.parent.children[i].position.z = await randY
       await WebGl.ssmoothyMove(obj.parent.children[i], {x: randX, y: randY, z: randZ});
     }
-    setTimeout(()=>{
+    setTimeout(() => {
       this.removeFromScene(this.LaserBeam)
       this.LaserBeam = undefined;
-    },100)
-    setTimeout(()=>{
+    }, 100)
+    setTimeout(() => {
       // obj.parent.remove(obj.parent.children[i])
       obj.parent.parent.remove(obj.parent)
       this.socket.emit("removePawn", obj.parent.position)
@@ -485,15 +496,15 @@ class Game {
   checkPlayerTurn = async () => {
     let turn = await this.net.getPlayerTurn()
     if (Game.playerTurn != turn)
-        Game.playerTurn = turn
+      Game.playerTurn = turn
 
     setTimeout(this.checkPlayerTurn, 150)
   }
-  static clearLaser(){
-    setTimeout(()=>{
-      if(this.LaserBeam)
+  static clearLaser() {
+    setTimeout(() => {
+      if (this.LaserBeam)
         this.removeFromScene(this.LaserBeam)
-    },100)
+    }, 100)
   }
 }
 
