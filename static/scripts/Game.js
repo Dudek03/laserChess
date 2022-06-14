@@ -451,10 +451,8 @@ class Game {
     alert(textWin)
   }
   destroy = async (obj) => {
-    // this.pawnTable[(obj.position.z + this.board.length * 10) / 20][(obj.position.x + this.board.length * 10) / 20] = 0;
-    console.log(obj)
-    console.log("destry")
-    this.net.removePawn(obj.parent.position)
+    this.pawns[(obj.parent.position.z + this.board.length * 10) / 20][(obj.parent.position.x + this.board.length * 10) / 20] = 0
+    this.net.removePawn({x: obj.parent.position.x,z: obj.parent.position.z})
     for (let i = 0; i < obj.parent.children.length; i++) {
         let randX = Math.floor(Math.random() * (100 + 1)) - 50;
         let randY = Math.floor(Math.random() * (100 + 1)) - 50;

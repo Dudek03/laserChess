@@ -76,14 +76,14 @@ module.exports = {
             data.pawns[pos.oldZ][pos.oldX] = 0
             data.pawns[pos.newZ][pos.newX] = modelNum
         }
-        if(pos.color == "Red" && data.turn == false)
+        if (pos.color == "Red" && data.turn == false)
             data.turn = true
-        else if(pos.color == "Blue" && data.turn == true)
+        else if (pos.color == "Blue" && data.turn == true)
             data.turn = false
     },
-  
+
     removePawn: (pos) => {
-      // data.pawns[(pos.z + data.board.length * 10) / 20][(pos.x + data.board.length * 10) / 20] = 0
+        data.pawns[(pos.z + data.board.length * 10) / 20][(pos.x + data.board.length * 10) / 20] = 0
     },
 
     restartGame: () => {
