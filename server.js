@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
     })
     socket.on("removePawn", async (pawn) => {
         const data = gamesArray.find(e => e.userTab.find(f => f.id == socket.id))
-        userController.removePawn(pawn, dprocess.env.PORT || ata)
+        userController.removePawn(pawn, data)
         socket.to(data.gameId).emit("move", data)
     })
 });
