@@ -359,9 +359,6 @@ class Game {
       this.pawns[positions.oldZ][positions.oldX] = 0
       this.pawns[positions.newZ][positions.newX] = modelNum
     }
-    await this.net.playerMove(positions)
-    await this.webgl.smoothyMove(this.clicked, pos)
-
     await this.webgl.smoothyMove(this.clicked,pos)
 
     this.clicked = null
@@ -498,7 +495,6 @@ class Game {
     if (Game.playerTurn != turn)
       Game.playerTurn = turn
 
-    setTimeout(this.checkPlayerTurn, 150)
   }
   static clearLaser() {
     setTimeout(() => {

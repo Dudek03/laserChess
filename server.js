@@ -2,6 +2,7 @@ var express = require("express")
 var app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
+
 const PORT = process.env.PORT || 3000
 app.use(express.static('static'))
 var path = require("path")
@@ -25,7 +26,8 @@ io.on("connection", (socket) => {
             gamesArray[gamesArray.length - 1].userTab.push({id: socket.id, login: data.login})
         }
         socket.join(gamesArray[gamesArray.length - 1].gameId);
-        if(gamesArray[gamesArray.length - 1].userTab.length == 2) io.to(gamesArray[gamesArray.length - 1].gameId).emit("fullRoom")
+        if(gamesArray[gamesArray.length - 1].userTab.length == 2)
+          io.to(gamesArray[gamesArray.length - 1].gameId).emit("fullRoom")
         socket.emit("player", gamesArray[gamesArray.length - 1].userTab.length)
     })
     socket.on("choosenMap", async (map) => {
@@ -48,7 +50,7 @@ io.on("connection", (socket) => {
     })
     socket.on("removePawn", async (pawn) => {
         const data = gamesArray.find(e => e.userTab.find(f => f.id == socket.id))
-        userController.removePawn(pawn, data)
+        userController.removePawn(pawn, dprocess.env.PORT || ata)
         socket.to(data.gameId).emit("move", data)
     })
 });
