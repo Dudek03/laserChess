@@ -30,7 +30,7 @@ class Ui {
     }
 
     changeUIOnLog(userObj) {
-        userObj = JSON.parse(userObj)
+        userObj = userObj
         document.getElementById("logged").innerHTML = userObj.user
         document.getElementById("loginWindow").style.fontSize = "xx-large"
         document.getElementById("loginWindow").innerText = "Oczekiwanie na drugiego gracza"
@@ -42,11 +42,6 @@ class Ui {
         else if (Ui.player.len == 2) {
             WebGl.instance.camera.position.set(0, 180, -200)
             WebGl.instance.camera.lookAt(0, 0, 0)
-        }
-        if (Ui.player.user == "Jesteś obserwatorem") {
-            WebGl.instance.camera.position.set(0, 100, 0)
-            WebGl.instance.camera.lookAt(0, 0, 0)
-            WebGl.instance.camera.rotation.z += Math.PI / 2
         }
     }
 

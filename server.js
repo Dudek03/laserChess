@@ -5,72 +5,61 @@ app.use(express.urlencoded({ extended: true }));
 const PORT = 3000;
 app.use(express.static('static'))
 var path = require("path")
+const { createServer } = require("http");
 const userController = require("./controllers/userController")
 const databaseController = require("./database/databaseController")
 const data = require("./Data")
+const httpServer = createServer(app);
+const { Server } = require("socket.io");
+const Data = require("./Data");
+const io = new Server(httpServer);
 
-//logowanie
+let gamesArray = [];
 
-app.post("/addPlayer", function (req, res){
-    let response = userController.add(req)
-    res.send(response)
-})
-
-app.get("/checkTabLen", function (req, res) {
-    let response = userController.checkTabLength()
-    res.send(response)
-})
-
-//wybór planszy
-
-app.post("/playerBoardChoice", function(req, res) {
-    let response = userController.addPlayerBoardChoice(req.body)
-    res.send(response)
-})
-
-app.get("/chosenBoardLen", function(req, res) {
-    let response = userController.checkChosenBoardLen()
-    res.send(response)
-})
-
-app.get("/chooseFinalBoard", function(req, res){
-    let response = userController.chooseFinalBoard()
-    console.log(response, "serwer")
-    console.log(data.finalBboard)
-    res.send(JSON.stringify(response))
-})
-
+io.on("connection", (socket) => {
+    const roomId = gamesArray.length
+    socket.on("join", data => {
+        if(gamesArray.length == 0 || gamesArray[gamesArray.length - 1].userTab.length == 2){
+            gamesArray.push(new Data("room" + roomId, {id: socket.id, login: data.login}))
+        }else{
+            gamesArray[gamesArray.length - 1].userTab.push({id: socket.id, login: data.login})
+        }
+        socket.join(gamesArray[gamesArray.length - 1].gameId);
+        if(gamesArray[gamesArray.length - 1].userTab.length == 2) io.to(gamesArray[gamesArray.length - 1].gameId).emit("fullRoom")
+        socket.emit("player", gamesArray[gamesArray.length - 1].userTab.length)
+    })
+    socket.on("choosenMap", async (map) => {
+        const room = gamesArray.find(e => e.userTab.find(f => f.id == socket.id))
+        room.chosenBoards.push(map)
+        if(room.chosenBoards.length == 2){
+            userController.chooseFinalBoard(room)
+            io.to("room" + roomId).emit("finalMap", await getTables(room) )
+        }
+    })
+    socket.on("playerMove", async (move) => {
+        console.log(move)
+        const data = gamesArray.find(e => e.userTab.find(f => f.id == socket.id))
+        console.log(data)
+        userController.playerMove(move, data)
+        console.log(data.turn)
+        socket.to(data.gameId).emit("move", data)
+        console.log(data.turn)
+    })
+    socket.on("removePawn", async (pawn) => {
+        const data = gamesArray.find(e => e.userTab.find(f => f.id == socket.id))
+        userController.removePawn(pawn, data)
+        socket.to(data.gameId).emit("move", data)
+    })
+});
 //pobranie tablic
-
-app.get("/getTables", async (req, res) => {
-    let response = await databaseController.getTabs()
+async function getTables(room){
+    let data = room
+    let response = await databaseController.getTabs(data)
     data.board = response.board
     data.pawns = response.pawns
     data.rotation = response.rotations
-    res.send(JSON.stringify(response))
-})
-
-app.post("/playerMove", function(req, res){
-    let response = userController.playerMove(req.body)
-    res.send()
-})
-
-app.post("/removePawn", function(req, res){
-    let response = userController.removePawn(req.body)
-    res.send()
-})
-
-app.get("/getPawns", function (req, res) {
-    res.send(JSON.stringify(data.pawns))
-})
-
-app.get("/getRotation", function (req, res) {
-    res.send(JSON.stringify(data.rotation))
-})
-
-app.get("/getTurn", function(req, res) {
-    res.send(JSON.stringify(data.turn))
-})
+    return {response, turn: data.turn}
+}
 
 app.post("/removePlayers", function (req, res){
     userController.restartGame()
@@ -78,6 +67,6 @@ app.post("/removePlayers", function (req, res){
 })
 
 //______________
-app.listen(PORT, function () {
+httpServer.listen(PORT, function () {
     console.log("start serwera na porcie " + PORT)
 })

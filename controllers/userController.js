@@ -1,54 +1,18 @@
-const data = require("../Data")
+
 module.exports = {
-
-    add: (req) => {
-        let ans = {}
-        if (data.userTab.length < 2) {
-            data.userTab.push(req.body)
-            ans.len = data.userTab.length
-            ans.user = data.userTab[data.userTab.length - 1].login
-            return ans
-        }
-        else {
-            ans.user = "Jesteś obserwatorem"
-            return ans
-        }
-    },
-
-    checkTabLength: () => {
-        let ans = {}
-        ans.len = data.userTab.length
-        return JSON.stringify(ans)
-    },
-
-    addPlayerBoardChoice: (req) => {
-        //let temp = JSON.parse(data)
-        let found = data.chosenBoards.find(e => e.login == req.login)
-        if (found) return
-        //console.log(req)
-        data.chosenBoards.push(req)
-        console.log(data.chosenBoards)
-    },
-
-    checkChosenBoardLen: () => {
-        let ans = {}
-        ans.len = data.chosenBoards.length
-        return JSON.stringify(ans)
-    },
-
-    chooseFinalBoard: () => {
+    chooseFinalBoard: (data) => {
         let res
-        let firstPlayerChoice = data.chosenBoards[0].choice
-        let secondPlayerChoice = data.chosenBoards[1].choice
-        if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice == 'random' && data.finalBboard == 0)
-            res = Math.floor(Math.random() * 5) + 1
+        let firstPlayerChoice = data.chosenBoards[0]
+        let secondPlayerChoice = data.chosenBoards[1]
+        if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice == 'random')
+            res = Math.floor(Math.random() * 6) + 1
 
         else if (firstPlayerChoice == secondPlayerChoice && firstPlayerChoice != 'random')
-            res = data.chosenBoards[0].choice
+            res = data.chosenBoards[0]
 
-        else if (firstPlayerChoice != secondPlayerChoice && firstPlayerChoice != 'random' && secondPlayerChoice != 'random' && data.finalBboard == 0) {
+        else if (firstPlayerChoice != secondPlayerChoice && firstPlayerChoice != 'random' && secondPlayerChoice != 'random') {
             let temp = Math.floor(Math.random() * 2)
-            res = data.chosenBoards[temp].choice
+            res = data.chosenBoards[temp]
         }
 
         else if (firstPlayerChoice != secondPlayerChoice && (firstPlayerChoice == 'random' || secondPlayerChoice == 'random')) {
@@ -61,12 +25,13 @@ module.exports = {
         else if (data.finalBboard != 0) {
             res = data.finalBboard
         }
-        data.finalBboard = res
-
+        data.finalBoard = res
+        console.log(res)
+        console.log(data)
         return [res]
     },
 
-    playerMove: (pos) => {
+    playerMove: (pos, data) => {
         //console.log(pos)
         if (pos.newX == "none" && pos.newZ == "none") {
             data.rotation[pos.oldZ][pos.oldX] += pos.rotation
@@ -76,13 +41,13 @@ module.exports = {
             data.pawns[pos.oldZ][pos.oldX] = 0
             data.pawns[pos.newZ][pos.newX] = modelNum
         }
-        if (pos.color == "Red" && data.turn == false)
+        if(pos.color == "Red" && data.turn == false)
             data.turn = true
-        else if (pos.color == "Blue" && data.turn == true)
+        else if(pos.color == "Blue" && data.turn == true)
             data.turn = false
     },
-
-    removePawn: (pos) => {
+  
+    removePawn: (pos, data) => {
         data.pawns[(pos.z + data.board.length * 10) / 20][(pos.x + data.board.length * 10) / 20] = 0
     },
 

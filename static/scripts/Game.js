@@ -10,19 +10,21 @@ import {
 class Game {
   static instance
   static playerTurn
-  constructor() {
+  constructor(socket) {
+    this.socket = socket
     this.rotationLaserX = 0;
     this.rotationLaserY = 0;
     this.rotationLaserZ = 40;
     this.objectArray = []
     Game.instance = this
     Game.playerTurn = true
-    this.net = new Net
+    this.net = new Net(socket)
     this.webgl = new WebGl
     this.ui = new Ui
     this.cubesTable = []
     this.pawnTable = []
     this.arrowChoice = document.querySelectorAll(".arrowChoice")
+
     this.createListeners()
   }
 
@@ -33,13 +35,6 @@ class Game {
     document.getElementById("logOn").addEventListener("click", () => {
       let name = document.getElementById("login").value
       this.net.addPlayer(name)
-      const checklogin = setInterval(async () => {
-        if ((await this.net.checkPlayers()).len == 2) {
-          clearInterval(checklogin)
-          this.ui.removeAlert()
-          this.ui.displayBoardChoice()
-        }
-      }, 250)
     })
 
     document.getElementById("reset").addEventListener("click", () => {
@@ -67,22 +62,29 @@ class Game {
       this.net.playerBoardChoice(playerChoice, name)
       this.ui.waitForSecondPlayerChoice()
       //PRZEPISAC NA SOCKET !!!
-      const checkBoardChoice = setInterval(async () => {
-        if ((await this.net.checkChosenBoardLen()).len == 2) {
-          clearInterval(checkBoardChoice)
-          this.net.chooseFinalBoard()
-          this.ui.removeAlert()
-          const dbTab = await this.net.getTables()
-          this.pawns = dbTab.pawns
-          this.board = dbTab.board
-          this.rotation = dbTab.rotations
-          this.createChessBoard()
-          this.createPawns()
-          this.checkPlayerTurn()
-          this.createRaycaster()
-          this.checkForChanges()
-        }
-      }, 1000)
+      this.socket.on("finalMap", (getTables) => {
+        this.loadMap(getTables)
+      })
+    })
+  }
+
+  async loadMap(dbTab){
+    console.log(dbTab)
+    const turn = dbTab.turn
+    dbTab = dbTab.response
+    this.ui.removeAlert()
+    this.pawns = dbTab.pawns
+    this.board = dbTab.board
+    this.rotation = dbTab.rotations
+    this.turn = turn
+    this.createChessBoard()
+    this.createPawns()
+    this.createRaycaster()
+    this.socket.on("move", (move) => {
+      console.log(move)
+      this.checkForChanges(move)
+      if (Game.playerTurn != move.turn)
+        Game.playerTurn = move.turn
     })
   }
 
@@ -347,7 +349,6 @@ class Game {
       //       .to({ x: pos.x, y: 20, z: pos.z }, 200)
       //       .easing(TWEEN.Easing.Quadratic.Out)
       //       .start()
-      await this.webgl.smoothyMove(this.clicked,pos)
       // this.clicked.position.x = await pos.x
       // this.clicked.position.z = await pos.z
       modelNum = this.pawns[positions.oldZ][positions.oldX]
@@ -355,16 +356,20 @@ class Game {
       this.pawns[positions.newZ][positions.newX] = modelNum
     }
 
+    await this.webgl.smoothyMove(this.clicked,pos)
+
     this.clicked = null
+
     setTimeout(()=>{
       this.laserShoot(Ui.player.len)
+    this.socket.emit("playerMove", positions)
+
     },300)
-    await this.net.playerMove(positions)
   }
 
-  checkForChanges = async () => {
-    let serverPawns = await this.net.getPawnsPosition()
-    let serverRotations = await this.net.getPawnsRotation()
+  checkForChanges = async (data) => {
+    let serverPawns = data.pawns
+    let serverRotations = data.rotation
     let newX
     let newZ
     let foundPawn
@@ -389,11 +394,11 @@ class Game {
     }
 
     if (foundPawn && newX >= 0 && newZ >= 0) {
-       this.webgl.smoothyMove(foundPawn,{x: (newX - this.board.length / 2) * 20, y: 20, z: (newZ - this.board.length / 2) * 20});
+       await this.webgl.smoothyMove(foundPawn,{x: (newX - this.board.length / 2) * 20, y: 20, z: (newZ - this.board.length / 2) * 20});
     }
     ///rotacja
-    for (let i = 0; i < serverPawns.length; i++) {
-      for (let j = 0; j < serverPawns[i].length; j++) {
+    for (let i = 0; i < serverRotations.length; i++) {
+      for (let j = 0; j < serverRotations[i].length; j++) {
         if (serverRotations[i][j] == this.rotation[i][j]) continue
         else if (serverRotations[i][j] != this.rotation[i][j]) {
           foundPawn = this.pawnTable.find(e => e.position.x == (j - this.board.length / 2) * 20 && e.position.z == (i - this.board.length / 2) * 20)
@@ -416,7 +421,6 @@ class Game {
         this.laserShoot(oposite)
       },300)
     }
-    setTimeout(this.checkForChanges, 250)
   }
   laserShoot = (player) => {
     setTimeout(()=>{
@@ -451,13 +455,18 @@ class Game {
     alert(textWin)
   }
   destroy = async (obj) => {
-    this.pawns[(obj.parent.position.z + this.board.length * 10) / 20][(obj.parent.position.x + this.board.length * 10) / 20] = 0
-    this.net.removePawn({x: obj.parent.position.x,z: obj.parent.position.z})
+    this.pawns[(obj.parent.position.z + this.board.length * 10) / 20][(obj.parent.position.x + this.board.length * 10) / 20] = 0;
+
+    console.log(obj)
+    console.log("destry")
     for (let i = 0; i < obj.parent.children.length; i++) {
-        let randX = Math.floor(Math.random() * (100 + 1)) - 50;
-        let randY = Math.floor(Math.random() * (100 + 1)) - 50;
-        let randZ = Math.floor(Math.random() * (100 + 1)) - 50;
-        await WebGl.ssmoothyMove(obj.parent.children[i], {x: randX, y: randY, z: randZ});
+      let randX = Math.floor(Math.random() * (100 + 1)) - 50;
+      let randY = Math.floor(Math.random() * (100 + 1)) - 50;
+      let randZ = Math.floor(Math.random() * (100 + 1)) - 50;
+
+      // obj.parent.children[i].position.x = await randX
+      // obj.parent.children[i].position.z = await randY
+      await WebGl.ssmoothyMove(obj.parent.children[i], {x: randX, y: randY, z: randZ});
     }
     setTimeout(()=>{
       this.removeFromScene(this.LaserBeam)
@@ -466,6 +475,8 @@ class Game {
     setTimeout(()=>{
       // obj.parent.remove(obj.parent.children[i])
       obj.parent.parent.remove(obj.parent)
+      this.socket.emit("removePawn", obj.parent.position)
+
     },2000)
     // console.log(obj.parent)
   }
