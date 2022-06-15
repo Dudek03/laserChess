@@ -493,7 +493,7 @@ class Game {
       // obj.parent.remove(obj.parent.children[i])
 
       if (!obj.parent.name.includes("king"))
-      obj.parent.parent.remove(obj.parent)
+      obj.parent.remove(obj.parent)
       this.socket.emit("removePawn", obj.parent.position)
 
     }, 2000)
