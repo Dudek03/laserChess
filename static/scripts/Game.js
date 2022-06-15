@@ -141,7 +141,7 @@ class Game {
         else if (this.pawns[i][j] == 6 || this.pawns[i][j] == 106)
           await pawn.init("sentry")
         pawn.pawn.children.forEach((item, i) => {
-          if (item.type.trim() == "Mesh" && item.name != "shelder" && !item.name.includes("laser")) {
+          if (item.type.trim() == "Mesh" && item.name != "shelder" && !item.name.includes("laser") && !item.name.includes("Cylinder")) {
             this.objectArray.push(item);
           }
         });
@@ -180,8 +180,8 @@ class Game {
           const CLICKEDCOLOR = clickedPawn.children[1].material.color
           const CLICKEDNAME = clickedPawn.children[0].name
           console.log(CLICKEDNAME)
-        if(CLICKEDNAME.includes("laser"))
-          return
+          if (CLICKEDNAME.includes("laser"))
+            return
           if (this.clicked && (this.clicked.children[0].name.split("-")[1] == "Red" && CLICKEDNAME.split("-")[1] == "Red" || this.clicked.children[0].name.split("-")[1] == "Blue" && CLICKEDNAME.split("-")[1] == "Blue")) {
             this.ui.hideArrows()
             if (this.clicked.children[0].name.split("-")[1] == "Red")
@@ -465,10 +465,11 @@ class Game {
     alert(textWin)
   }
   destroy = async (obj) => {
+    console.log(obj)
+    if (!obj)
+      return
     this.pawns[(obj.parent.position.z + this.board.length * 10) / 20][(obj.parent.position.x + this.board.length * 10) / 20] = 0;
 
-
-    console.log(obj)
     console.log("destry")
     for (let i = 0; i < obj.parent.children.length; i++) {
       let randX = Math.floor(Math.random() * (100 + 1)) - 50;
@@ -484,7 +485,8 @@ class Game {
       });
     }
     setTimeout(() => {
-      this.removeFromScene(this.LaserBeam)
+      if (!obj.parent.name.includes("king"))
+        this.removeFromScene(this.LaserBeam)
       this.LaserBeam = undefined;
     }, 100)
     setTimeout(() => {
@@ -503,8 +505,9 @@ class Game {
   }
   static clearLaser() {
     setTimeout(() => {
-      if (this.LaserBeam)
-        this.removeFromScene(this.LaserBeam)
+      if (!obj.parent.name.includes("king"))
+        if (this.LaserBeam)
+          this.removeFromScene(this.LaserBeam)
     }, 100)
   }
 }
