@@ -491,6 +491,8 @@ class Game {
     }, 100)
     setTimeout(() => {
       // obj.parent.remove(obj.parent.children[i])
+
+      if (!obj.parent.name.includes("king"))
       obj.parent.parent.remove(obj.parent)
       this.socket.emit("removePawn", obj.parent.position)
 
