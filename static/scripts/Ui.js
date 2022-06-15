@@ -48,7 +48,14 @@ class Ui {
     removeAlert() {
         document.getElementById("loginWindow").style.display = "none"
     }
-
+    static showWin(text){
+      let winPanel = document.createElement("div")
+      winPanel.classList.add("winPanel")
+      winPanel.innerHTML = "<h1>"+text+"</h1>"
+      document.body.innerHTML = ""
+      window.onclick = null
+      document.body.appendChild(winPanel)
+    }
 }
 
 export default Ui

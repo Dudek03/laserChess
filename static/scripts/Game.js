@@ -290,8 +290,9 @@ class Game {
   }
 
   move = async (pos) => {
-    if (this.LaserBeam)
-      this.removeFromScene(this.LaserBeam)
+    if (!this.clicked.children[0].name.includes("king"))
+      if (this.LaserBeam)
+        this.removeFromScene(this.LaserBeam)
     let modelNum
     let positions = {
       color: this.clicked.children[0].name.split("-")[1],
@@ -367,7 +368,6 @@ class Game {
     setTimeout(() => {
       this.laserShoot(Ui.player.len)
       this.socket.emit("playerMove", positions)
-
     }, 300)
   }
 
@@ -434,8 +434,8 @@ class Game {
   }
   laserShoot = (player) => {
     setTimeout(() => {
-      if (this.LaserBeam)
-        this.removeFromScene(this.LaserBeam)
+        if (this.LaserBeam)
+          this.removeFromScene(this.LaserBeam)
     }, 1000)
     this.LaserBeam = new LaserBeam({
       reflectMax: 10
@@ -457,12 +457,12 @@ class Game {
 
   }
   static win = (obj) => {
-    let textWin = "win "
+    let textWin = "wygral "
     if (obj.parent.children[0].name.includes("Blue"))
       textWin += "czerwony"
     if (obj.parent.children[0].name.includes("Red"))
       textWin += "niebieski"
-    alert(textWin)
+    Ui.showWin(textWin)
   }
   destroy = async (obj) => {
     console.log(obj)
@@ -485,7 +485,7 @@ class Game {
       });
     }
     setTimeout(() => {
-      if (!obj.parent.name.includes("king"))
+            if (!obj.parent.name.includes("king"))
         this.removeFromScene(this.LaserBeam)
       this.LaserBeam = undefined;
     }, 100)
