@@ -68,7 +68,7 @@ class Game {
     })
   }
 
-  async loadMap(dbTab){
+  async loadMap(dbTab) {
     console.log(dbTab)
     const turn = dbTab.turn
     dbTab = dbTab.response
@@ -140,13 +140,12 @@ class Game {
           await pawn.init("mirror")
         else if (this.pawns[i][j] == 6 || this.pawns[i][j] == 106)
           await pawn.init("sentry")
-        if (pawn.pawn.name != "laser") {
-          pawn.pawn.children.forEach((item, i) => {
-            if (item.type.trim() == "Mesh" && item.name != "shelder") {
-              this.objectArray.push(item);
-            }
-          });
-        }
+        pawn.pawn.children.forEach((item, i) => {
+          if (item.type.trim() == "Mesh" && item.name != "shelder" && !item.name.includes("laser")) {
+            this.objectArray.push(item);
+          }
+        });
+
 
         if (this.pawns[i][j] == 1000 || (this.pawns[i][j] > 0 && this.pawns[i][j] < 100)) {
 
@@ -359,16 +358,16 @@ class Game {
       this.pawns[positions.oldZ][positions.oldX] = 0
       this.pawns[positions.newZ][positions.newX] = modelNum
     }
-    await this.webgl.smoothyMove(this.clicked,pos)
+    await this.webgl.smoothyMove(this.clicked, pos)
 
     this.clicked = null
 
 
-    setTimeout(()=>{
+    setTimeout(() => {
       this.laserShoot(Ui.player.len)
-    this.socket.emit("playerMove", positions)
+      this.socket.emit("playerMove", positions)
 
-    },300)
+    }, 300)
   }
 
   checkForChanges = async (data) => {
@@ -416,7 +415,8 @@ class Game {
         }
       }
     }
-    if (foundPawn && rotation)
+
+    if (foundPawn && rotation != null)
       foundPawn.rotation.y = rotation * Math.PI / 2 * -1
     this.pawns = serverPawns
     this.rotation = serverRotations
@@ -476,7 +476,11 @@ class Game {
 
       // obj.parent.children[i].position.x = await randX
       // obj.parent.children[i].position.z = await randY
-      await WebGl.ssmoothyMove(obj.parent.children[i], {x: randX, y: randY, z: randZ});
+      await WebGl.ssmoothyMove(obj.parent.children[i], {
+        x: randX,
+        y: randY,
+        z: randZ
+      });
     }
     setTimeout(() => {
       this.removeFromScene(this.LaserBeam)
@@ -487,7 +491,7 @@ class Game {
       obj.parent.parent.remove(obj.parent)
       this.socket.emit("removePawn", obj.parent.position)
 
-    },2000)
+    }, 2000)
     // console.log(obj.parent)
   }
   checkPlayerTurn = async () => {
