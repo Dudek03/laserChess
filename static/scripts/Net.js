@@ -7,7 +7,6 @@ class Net {
 
     addPlayer(name) {
         this.socket.on("fullRoom", () => {
-            console.log("X kurwa D")
             this.ui.removeAlert()
             this.ui.displayBoardChoice()
           })
@@ -15,7 +14,6 @@ class Net {
             this.ui.changeUIOnLog({len: data, user: name})
         })
         this.socket.emit("join", { login: name })
-        console.log("xd")
     }
 
     playerBoardChoice(data, name) {
