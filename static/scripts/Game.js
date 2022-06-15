@@ -179,6 +179,9 @@ class Game {
           if (clickedPawn.name != "Scene") return
           const CLICKEDCOLOR = clickedPawn.children[1].material.color
           const CLICKEDNAME = clickedPawn.children[0].name
+          console.log(CLICKEDNAME)
+        if(CLICKEDNAME.includes("laser"))
+          return
           if (this.clicked && (this.clicked.children[0].name.split("-")[1] == "Red" && CLICKEDNAME.split("-")[1] == "Red" || this.clicked.children[0].name.split("-")[1] == "Blue" && CLICKEDNAME.split("-")[1] == "Blue")) {
             this.ui.hideArrows()
             if (this.clicked.children[0].name.split("-")[1] == "Red")
@@ -289,7 +292,6 @@ class Game {
   move = async (pos) => {
     if (this.LaserBeam)
       this.removeFromScene(this.LaserBeam)
-    let rot = this.clicked.children.find(mech => mech.name == "Cube008")
     let modelNum
     let positions = {
       color: this.clicked.children[0].name.split("-")[1],
@@ -302,7 +304,6 @@ class Game {
 
     if (this.clicked.children[0].name.split("-")[1] == "Blue")
       this.clicked.children[1].material.color.setHex(0x0a0ab0)
-
     let greenCubes = this.cubesTable.filter(e => e.children[6].material.color.g == 1)
     greenCubes.forEach(e => {
       let x = (e.position.x + this.board.length * 10) / 20
