@@ -20,22 +20,22 @@ let gamesArray = [];
 io.on("connection", (socket) => {
     const roomId = gamesArray.length
     socket.on("join", data => {
-        if(gamesArray.length == 0 || gamesArray[gamesArray.length - 1].userTab.length == 2){
-            gamesArray.push(new Data("room" + roomId, {id: socket.id, login: data.login}))
-        }else{
-            gamesArray[gamesArray.length - 1].userTab.push({id: socket.id, login: data.login})
+        if (gamesArray.length == 0 || gamesArray[gamesArray.length - 1].userTab.length == 2) {
+            gamesArray.push(new Data("room" + roomId, { id: socket.id, login: data.login }))
+        } else {
+            gamesArray[gamesArray.length - 1].userTab.push({ id: socket.id, login: data.login })
         }
         socket.join(gamesArray[gamesArray.length - 1].gameId);
-        if(gamesArray[gamesArray.length - 1].userTab.length == 2)
-          io.to(gamesArray[gamesArray.length - 1].gameId).emit("fullRoom")
+        if (gamesArray[gamesArray.length - 1].userTab.length == 2)
+            io.to(gamesArray[gamesArray.length - 1].gameId).emit("fullRoom")
         socket.emit("player", gamesArray[gamesArray.length - 1].userTab.length)
     })
     socket.on("choosenMap", async (map) => {
         const room = gamesArray.find(e => e.userTab.find(f => f.id == socket.id))
         room.chosenBoards.push(map)
-        if(room.chosenBoards.length == 2){
+        if (room.chosenBoards.length == 2) {
             userController.chooseFinalBoard(room)
-            io.to("room" + roomId).emit("finalMap", await getTables(room) )
+            io.to("room" + roomId).emit("finalMap", await getTables(room))
         }
     })
     socket.on("playerMove", async (move) => {
@@ -55,16 +55,16 @@ io.on("connection", (socket) => {
     })
 });
 //pobranie tablic
-async function getTables(room){
+async function getTables(room) {
     let data = room
     let response = await databaseController.getTabs(data)
     data.board = response.board
     data.pawns = response.pawns
     data.rotation = response.rotations
-    return {response, turn: data.turn}
+    return { response, turn: data.turn }
 }
 
-app.post("/removePlayers", function (req, res){
+app.post("/removePlayers", function (req, res) {
     userController.restartGame()
     res.send()
 })
